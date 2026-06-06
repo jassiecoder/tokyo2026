@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚗 東京五日遊 - 車車大冒險 & 浪漫東京鐵塔 🗼</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #74b9ff;     
+            --secondary: #ff7675;   
+            --yellow: #ffeaa7;      
+            --mint: #55efc4;        
+            --transport: #a29bfe;   
+            --bg-color: #fdfbfb;
+            --card-bg: #FFFFFF;
+            --text-main: #2d3436;
+            --tokyo-tower: #e17055;
+        }
+        body {
+            font-family: 'Nunito', 'M PLUS Rounded 1c', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(#dfe6e9 2px, transparent 2px);
+            background-size: 30px 30px;
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        header {
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            color: #2d3436;
+            text-align: center;
+            padding: 3rem 1rem 2.5rem;
+            border-bottom: 6px dashed #ffffff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            position: relative;
+        }
+        h1 { margin: 0; font-size: 2.2rem; font-weight: 800; text-shadow: 2px 2px 0px #ffffff; }
+        .subtitle { font-size: 1.1rem; margin-top: 0.8rem; font-weight: 600; color: #636e72; background: rgba(255,255,255,0.6); display: inline-block; padding: 0.4rem 1.2rem; border-radius: 30px; }
+        .info-bar { background: #ffeaa7; color: #2d3436; padding: 0.8rem; text-align: center; font-size: 1.05rem; font-weight: 700; border-bottom: 3px solid #fdcb6e; }
+        
+        .container { max-width: 950px; margin: 2rem auto; padding: 0 1rem; }
+        
+        .timeline { position: relative; margin: 2rem 0; padding-left: 1.5rem; border-left: 4px solid #74b9ff; }
+        .day-card { 
+            background: var(--card-bg); 
+            border-radius: 24px; 
+            padding: 1.8rem; 
+            margin-bottom: 2rem; 
+            box-shadow: 0 8px 20px rgba(116, 185, 255, 0.15); 
+            position: relative; 
+            border: 2px solid #f1f2f6;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1;
+        }
+        .day-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .day-card::before { 
+            content: '🚗'; position: absolute; left: -2.3rem; top: 1.5rem; width: 2rem; height: 2rem; 
+            background: var(--yellow); border-radius: 50%; border: 4px solid #fff; 
+            display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .day-title { font-size: 1.4rem; font-weight: 800; color: var(--primary); margin-bottom: 1.2rem; margin-top: 0; background: #f1f8ff; display: inline-block; padding: 0.4rem 1.2rem; border-radius: 20px; }
+        
+        /* Checklist Styles */
+        .time-slot { 
+            display: flex; margin-bottom: 1rem; border-bottom: 2px dotted #f1f2f6; padding-bottom: 1rem; 
+            align-items: flex-start; position: relative; padding: 0.8rem; border-radius: 12px; transition: background 0.2s;
+        }
+        .time-slot:hover { background: #fafbfc; }
+        .time-slot:last-child { border-bottom: none; margin-bottom: 0; }
+        .checkbox-wrapper { margin-top: 0.2rem; margin-right: 15px; display: flex; align-items: center; }
+        .row-checkbox { 
+            appearance: none; width: 1.5rem; height: 1.5rem; border: 2px solid var(--primary); border-radius: 50%;
+            cursor: pointer; outline: none; transition: all 0.2s; background: white; position: relative;
+        }
+        .row-checkbox:checked { background-color: var(--mint); border-color: var(--mint); }
+        .row-checkbox:checked::after { content: '✔'; color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1rem; font-weight: bold; }
+
+        .time { width: 130px; font-weight: 800; color: #0984e3; flex-shrink: 0; padding-top: 0.1rem; cursor: pointer; font-size: 1.05rem; }
+        .activity { flex-grow: 1; transition: all 0.3s ease; position: relative; font-size: 1.05rem; }
+        
+        .time-slot.checked .activity { text-decoration: line-through; color: #b2bec3; opacity: 0.7; }
+        .time-slot.checked .time { color: #b2bec3; }
+        .time-slot.checked .meal-highlight { color: #b2bec3; }
+
+        .meal-highlight { color: var(--secondary); font-weight: 800; font-size: 1.1rem; background: #ffefef; padding: 0.2rem 0.6rem; border-radius: 8px; }
+        .spot-highlight { color: #6c5ce7; font-weight: 800; background: #f3f0ff; padding: 0.1rem 0.5rem; border-radius: 6px; }
+        .tokyo-tower-highlight { color: white; font-weight: 800; background: var(--tokyo-tower); padding: 0.2rem 0.8rem; border-radius: 20px; box-shadow: 0 2px 5px rgba(225, 112, 85, 0.4); display: inline-block; margin-bottom: 0.5rem; }
+        
+        /* Google Maps Link Style */
+        .map-spot { color: #0984e3; font-weight: 800; text-decoration: underline dashed #74b9ff; transition: all 0.2s; }
+        .map-spot:hover { color: var(--secondary); text-decoration: underline solid var(--secondary); }
+
+        .badges-container { margin-top: 0.8rem; display: flex; gap: 0.6rem; flex-wrap: wrap; position: relative; }
+        
+        /* DROPDOWN MENU */
+        .dropdown { position: relative; display: inline-block; outline: none; }
+        .dropbtn { 
+            background-color: #ffffff; border: 2px solid var(--primary); color: var(--primary); 
+            padding: 0.5rem 1rem; border-radius: 25px; font-size: 0.95rem; font-weight: 800; 
+            cursor: pointer; transition: all 0.2s; user-select: none; box-shadow: 0 4px 6px rgba(116, 185, 255, 0.1);
+        }
+        .dropbtn:hover { transform: scale(1.05); }
+        .dropbtn.active { background-color: var(--primary); color: white; }
+        
+        /* 交通按鈕專屬樣式 */
+        .transport-btn { border-color: var(--transport); color: var(--transport); box-shadow: 0 4px 6px rgba(162, 155, 254, 0.1); }
+        .transport-btn.active, .transport-btn:hover { background-color: var(--transport); color: white; }
+        .transport-header { background: var(--transport) !important; }
+
+        .dropdown-content { 
+            display: none; position: absolute; top: 100%; left: 0; margin-top: 10px; width: 320px; 
+            background-color: white; border: 3px solid #f1f2f6; box-shadow: 0 15px 35px rgba(0,0,0,0.15); 
+            border-radius: 16px; z-index: 99999; text-align: left; overflow: hidden;
+            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .dropdown-content.show { display: block; }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .popup-header { background: var(--primary); color: white; padding: 0.8rem 1rem; font-weight: 800; font-size: 1.05rem; text-align: center; }
+        .popup-list { list-style: none; padding: 0; margin: 0; max-height: 320px; overflow-y: auto; }
+        .popup-list::-webkit-scrollbar { width: 6px; }
+        .popup-list::-webkit-scrollbar-track { background: #f1f1f1; }
+        .popup-list::-webkit-scrollbar-thumb { background: #b2bec3; border-radius: 10px; }
+        .popup-list li { padding: 0.8rem 1rem; border-bottom: 1px dashed #dfe6e9; font-size: 0.9rem; line-height: 1.4; transition: background 0.2s; }
+        .popup-list li:last-child { border-bottom: none; }
+        .popup-list li:hover { background-color: #f8fbff; }
+        
+        .res-name { display: block; font-weight: 800; color: #0984e3; text-decoration: none; font-size: 1rem; margin-bottom: 0.3rem; outline: none; }
+        .res-name:hover { color: var(--secondary); }
+        .res-meta { color: #636e72; font-size: 0.85rem; margin-bottom: 0.3rem; font-weight: 600;}
+        .res-desc { color: #2d3436; }
+
+        @media (max-width: 768px) {
+            .time-slot { flex-wrap: wrap; }
+            .time { width: 100%; margin-bottom: 0.4rem; padding-left: 2.2rem; }
+            .activity { padding-left: 2.2rem; width: 100%; }
+            .checkbox-wrapper { position: absolute; margin-top: 0.1rem; }
+            .dropdown-content { width: 290px; left: -10px; }
+            header { padding: 2rem 1rem; }
+            h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🚓 東京車車大冒險 🚒</h1>
+        <div class="subtitle">永久記憶打勾狀態 ｜ 全車程<20分 ｜ 超詳細交通 Popup ✨</div>
+    </header>
+    <div class="info-bar">
+        📅 7/16 - 7/20 &nbsp;✈️ BR196 & BR197 &nbsp;🏨 &Here Ueno Tokyo &nbsp;🕛 午餐嚴守 12:00
+    </div>
+
+    <div class="container">
+        <div class="timeline">
+            <!-- Day 1 -->
+            <div class="day-card">
+                <h3 class="day-title">Day 1 (7/16)：抵達東京，輕鬆入住 🛬</h3>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">15:20 - 19:40</div>
+                    <div class="activity">搭乘 <strong>BR196</strong> 抵達 <a href="https://www.google.com/maps/search/?api=1&query=成田国際空港" target="_blank" class="map-spot">東京成田機場 (NRT)</a> ✈️。</div>
+                </div>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">20:30 - 21:30</div>
+                    <div class="activity">搭乘 Skyliner 🚄 直達上野，抵達飯店 <a href="https://www.google.com/maps/search/?api=1&query=&Here+Ueno+Tokyo" target="_blank" class="map-spot">&Here Ueno Tokyo</a> 辦理入住。
+                        <div class="badges-container">
+                            <div class="dropdown">
+                                <button class="dropbtn transport-btn">🚃 交通攻略：機場 ➔ 飯店</button>
+                                <div class="dropdown-content">
+                                    <div class="popup-header transport-header">🚇 Skyliner 詳細指南 (車程41分)</div>
+                                    <ul class="popup-list">
+                                        <li><div class="res-name">1. 尋找京成電鐵</div><div class="res-desc">在成田機場出境大廳後，循著「鐵道 (Railways)」指標搭電扶梯至 B1，尋找藍色「京成電鐵」售票處換票。</div></li>
+                                        <li><div class="res-name">2. 輕鬆直達</div><div class="res-desc">全車對號座，車程約 41 分鐘，直達「京成上野站」。</div></li>
+                                        <li><div class="res-name">3. 步行至飯店 (<10分)</div><div class="res-desc">從「不忍口」出站，沿著上野恩賜公園與不忍池旁平坦的道路步行約 6 分鐘即可抵達飯店。</div></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">21:30 後</div>
+                    <div class="activity">
+                        <span class="meal-highlight">🍻 宵夜時間</span>：抵達時間晚，外帶美味點心回飯店。
+                        <div class="badges-container auto-meal" data-type="late-night"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Day 2 -->
+            <div class="day-card">
+                <h3 class="day-title">Day 2 (7/17)：科學火車、遊樂園與扭蛋大軍 🎡</h3>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">08:30 - 09:30</div>
+                    <div class="activity">
+                        <span class="meal-highlight">🥞 早餐時間</span>：吃飽喝足準備放電！
+                        <div class="badges-container auto-meal" data-type="breakfast"></div>
+                    </div>
+                </div>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">09:30 - 11:45</div>
+                    <div class="activity">散步至 <a href="https://www.google.com/maps/search/?api=1&query=上野恩賜公園" target="_blank" class="map-spot">上野恩賜公園</a> 與 <a href="https://www.google.com/maps/search/?api=1&query=国立科学博物館" target="_blank" class="map-spot">國立科學博物館</a> 🦕：館內有超大實體火車頭，孩子的最愛！(步行<10分)</div>
+                </div>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">12:00 - 13:00</div>
+                    <div class="activity">
+                        <span class="meal-highlight">🍴 午餐時間 (嚴守12:00)</span>：於上野周邊享用午餐。
+                        <div class="badges-container auto-meal" data-type="lunch-dinner"></div>
+                    </div>
+                </div>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">13:30 - 15:30</div>
+                    <div class="activity">前往 <a href="https://www.google.com/maps/search/?api=1&query=浅草花やしき" target="_blank" class="map-spot">淺草花屋敷 (Hanayashiki)</a> 🎡：日本最古老的遊樂園，滿滿適合 4 歲小童的溫和遊樂設施！
+                        <div class="badges-container">
+                            <div class="dropdown">
+                                <button class="dropbtn transport-btn">🚃 交通攻略：上野 ➔ 淺草花屋敷</button>
+                                <div class="dropdown-content">
+                                    <div class="popup-header transport-header">🚇 激短車程指南 (車程僅 5 分鐘)</div>
+                                    <ul class="popup-list">
+                                        <li><div class="res-name">1. 搭乘銀座線</div><div class="res-desc">在「上野站」搭乘東京地鐵【銀座線】（橘色標誌，往淺草方向）。</div></li>
+                                        <li><div class="res-name">2. 抵達淺草站</div><div class="res-desc">搭乘 3 站 (約 5 分鐘) 抵達「淺草站」。</div></li>
+                                        <li><div class="res-name">3. 步行至遊樂園</div><div class="res-desc">出站後穿越淺草寺商圈，步行約 7 分鐘即可抵達花屋敷。</div></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">15:30 - 17:00</div>
+                    <div class="activity">步行前往 <a href="https://www.google.com/maps/search/?api=1&query=ガシャポンのデパート+浅草ROX店" target="_blank" class="map-spot">淺草 ROX 扭蛋百貨</a> 🔮：上千台扭蛋機讓孩子一次扭個夠！(從遊樂園步行僅需 4 分鐘)</div>
+                </div>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">17:30 - 19:00</div>
+                    <div class="activity">
+                        <span class="meal-highlight">🍽️ 晚餐時間 (嚴守17:30)</span>：在淺草周邊享用，或回上野吃大餐。
+                        <div class="badges-container auto-meal" data-type="lunch-dinner">
+                            <div class="dropdown">
+                                <button class="dropbtn transport-btn">🚃 交通攻略：淺草 ➔ 上野</button>
+                                <div class="dropdown-content">
+                                    <div class="popup-header transport-header">🚇 輕鬆返回指南 (車程 5 分鐘)</div>
+                                    <ul class="popup-list">
+                                        <li><div class="res-name">原線返回最簡單</div><div class="res-desc">從淺草站搭乘【銀座線】回到上野站即可，完全不費力。</div></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Day 3 -->
+            <div class="day-card">
+                <h3 class="day-title">Day 3 (7/18)：全東京最強室內車車天堂 🏎️</h3>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">08:30 - 09:30</div>
+                    <div class="activity"><span class="meal-highlight">🥞 早餐時間</span><div class="badges-container auto-meal" data-type="breakfast"></div></div>
+                </div>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">10:00 - 12:00</div>
+                    <div class="activity">前往 <a href="https://www.google.com/maps/search/?api=1&query=ASOBono!+アソボーノ" target="_blank" class="map-spot">ASOBono! (東京巨蛋城)</a> 🎪：一整區超巨大 Plarail 鐵道與 Tomica 放電區，男孩天堂！
+                        <div class="badges-container">
+                            <div class="dropdown">
+                                <button class="dropbtn transport-btn">🚃 交通攻略：上野 ➔ 東京巨蛋城</button>
+                                <div class="dropdown-content">
+                                    <div class="popup-header transport-header">🚇 地鐵直達指南 (車程 4 分鐘)</div>
+                                    <ul class="popup-list">
+                                        <li><div class="res-name">1. 前往上野御徒町站</div><div class="res-desc">從飯店步行一小段至「上野御徒町站」。</div></li>
+                                        <li><div class="res-name">2. 搭乘大江戶線</div><div class="res-desc">搭乘【都營大江戶線】(往光丘方向)，搭乘 2 站至「春日站」。</div></li>
+                                        <li><div class="res-name">3. 步行抵達</div><div class="res-desc">出站後往東京巨蛋城方向步行約 5 分鐘，ASOBono! 就在黃色大樓旁。</div></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">12:00 - 13:00</div>
+                    <div class="activity"><span class="meal-highlight">🍴 午餐時間 (嚴守12:00)</span>：直接在巨蛋城美食街開心用餐。<div class="badges-container auto-meal" data-type="lunch-dinner"></div></div>
+                </div>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">13:30 - 15:30</div>
+                    <div class="activity">繼續在 ASOBono! 爽玩，或是去外面搭乘適合小童的遊樂設施 🎢。</div>
+                </div>
+                <!-- 多慶屋採買安排於此 -->
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">16:00 - 17:30</div>
+                    <div class="activity">
+                        <span class="spot-highlight">🛒 戰利品掃貨時間</span>：順路前往 <a href="https://www.google.com/maps/search/?api=1&query=多慶屋+御徒町" target="_blank" class="map-spot">多慶屋 (Takeya)</a>！紫色大樓超醒目，把藥妝、零食、伴手禮一次買齊，買完直接拿回旁邊的飯店放！
+                        <div class="badges-container">
+                            <div class="dropdown">
+                                <button class="dropbtn transport-btn">🚃 交通攻略：巨蛋城 ➔ 多慶屋</button>
+                                <div class="dropdown-content">
+                                    <div class="popup-header transport-header">🚇 採買直達指南 (車程 4 分鐘)</div>
+                                    <ul class="popup-list">
+                                        <li><div class="res-name">1. 搭乘大江戶線返回</div><div class="res-desc">從「春日站」搭乘【都營大江戶線】(往兩國方向)，2 站回到「上野御徒町站」。</div></li>
+                                        <li><div class="res-name">2. 步行至多慶屋</div><div class="res-desc">出站後步行約 3 分鐘，即可看到多慶屋「紫色大樓群」，離飯店也非常近！</div></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">17:30 - 19:00</div>
+                    <div class="activity"><span class="meal-highlight">🍽️ 晚餐時間 (嚴守17:30)</span>：放好戰利品，輕鬆吃大餐補體力！<div class="badges-container auto-meal" data-type="lunch-dinner"></div></div>
+                </div>
+            </div>
+
+            <!-- Day 4 -->
+            <div class="day-card">
+                <h3 class="day-title">Day 4 (7/19)：BicCamera玩具天堂與浪漫東京鐵塔朝聖 🗼</h3>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">08:30 - 09:30</div>
+                    <div class="activity"><span class="meal-highlight">🥞 早餐時間</span><div class="badges-container auto-meal" data-type="breakfast"></div></div>
+                </div>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">10:00 - 11:45</div>
+                    <div class="activity">前往 <a href="https://www.google.com/maps/search/?api=1&query=BicCamera+AKIBA" target="_blank" class="map-spot">BicCamera AKIBA (秋葉原店)</a> 🕹️：7樓有超級豐富的玩具區、Tomica、火車模型任孩子挑選！
+                        <div class="badges-container">
+                            <div class="dropdown">
+                                <button class="dropbtn transport-btn">🚃 交通攻略：上野 ➔ 秋葉原</button>
+                                <div class="dropdown-content">
+                                    <div class="popup-header transport-header">🚇 超短車程指南 (車程僅 3 分鐘)</div>
+                                    <ul class="popup-list">
+                                        <li><div class="res-name">1. 搭乘 JR 山手線</div><div class="res-desc">進入 JR 上野站，搭乘綠色標誌的【JR 山手線】(往秋葉原/東京方向)。</div></li>
+                                        <li><div class="res-name">2. 抵達秋葉原</div><div class="res-desc">搭乘 2 站 (約 3 分鐘) 抵達「秋葉原站」。</div></li>
+                                        <li><div class="res-name">3. 直達 BicCamera</div><div class="res-desc">從電器街口出站，立刻就能看到 BicCamera AKIBA 大樓。</div></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">12:00 - 13:00</div>
+                    <div class="activity"><span class="meal-highlight">🍴 午餐時間 (嚴守12:00)</span>：秋葉原周邊美味餐廳。<div class="badges-container auto-meal" data-type="lunch-dinner"></div></div>
+                </div>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">13:30 - 16:00</div>
+                    <div class="activity">前往 <a href="https://www.google.com/maps/search/?api=1&query=博品館+TOY+PARK+銀座本店" target="_blank" class="map-spot">博品館 Toy Park 銀座本店</a> 🧸：上4樓體驗超大型軌道遙控賽車。
+                        <div class="badges-container">
+                            <div class="dropdown">
+                                <button class="dropbtn transport-btn">🚃 交通攻略：秋葉原 ➔ 銀座</button>
+                                <div class="dropdown-content">
+                                    <div class="popup-header transport-header">🚇 輕鬆轉移指南 (車程 12 分鐘)</div>
+                                    <ul class="popup-list">
+                                        <li><div class="res-name">1. 搭乘日比谷線</div><div class="res-desc">在秋葉原搭乘銀色標誌的【東京地鐵日比谷線】。</div></li>
+                                        <li><div class="res-name">2. 抵達銀座</div><div class="res-desc">搭乘 6 站 (約 12 分鐘) 到達「銀座站」。</div></li>
+                                        <li><div class="res-name">3. 抵達博品館</div><div class="res-desc">從銀座站 A3 出口出來，沿著中央通直走約 5 分鐘，即可抵達玩具天堂。</div></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">16:30 - 17:30</div>
+                    <div class="activity">
+                        <span class="tokyo-tower-highlight">🗼 【重磅巨獻】朝聖 東京鐵塔</span><br>
+                        前往 <a href="https://www.google.com/maps/search/?api=1&query=東京タワー" target="_blank" class="map-spot">東京鐵塔 (Tokyo Tower)</a>！從銀座出發極近，這是《東京愛情故事》完治與莉香最扣人心弦的永恆地標。黃昏至夕陽西下，親眼看著整座赤紅鐵塔點亮點點橘光✨，耳邊彷彿響起那首《突如其來的愛情故事》！塔下寬敞，小孩看大鐵塔也很興奮，完美兼顧大人情懷與小孩放電。
+                        <div class="badges-container">
+                            <div class="dropdown">
+                                <button class="dropbtn transport-btn">🚃 交通攻略：銀座 ➔ 東京鐵塔</button>
+                                <div class="dropdown-content">
+                                    <div class="popup-header transport-header">🚇 浪漫朝聖路線 (車程 5 分鐘)</div>
+                                    <ul class="popup-list">
+                                        <li><div class="res-name">1. 搭乘日比谷線</div><div class="res-desc">走回銀座站，搭乘【東京地鐵日比谷線】（往中目黑方向）。</div></li>
+                                        <li><div class="res-name">2. 抵達神谷町站</div><div class="res-desc">僅需搭乘 2 站 (約 5 分鐘) 至「神谷町站」。</div></li>
+                                        <li><div class="res-name">3. 漫步向鐵塔</div><div class="res-desc">從 1 號出口出站，步行約 7 分鐘，沿途就能看到美麗的紅色鐵塔在眼前越來越大，非常浪漫！</div></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">17:30 - 19:00</div>
+                    <div class="activity"><span class="meal-highlight">🍽️ 晚餐時間 (嚴守17:30)</span>：東京鐵塔周邊或回上野享用晚餐。<div class="badges-container auto-meal" data-type="lunch-dinner">
+                        <!-- 回程交通按鈕 -->
+                        <div class="dropdown">
+                            <button class="dropbtn transport-btn">🚃 交通攻略：東京鐵塔 ➔ 上野</button>
+                            <div class="dropdown-content">
+                                <div class="popup-header transport-header">🚇 歸途指南 (車程 19 分鐘)</div>
+                                <ul class="popup-list">
+                                    <li><div class="res-name">直達免轉車</div><div class="res-desc">走回「神谷町站」，搭乘【東京地鐵日比谷線】（往北千住/上野方向），即可免轉車直達「上野站」，步行回飯店休息。</div></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div></div>
+                </div>
+            </div>
+
+            <!-- Day 5 -->
+            <div class="day-card">
+                <h3 class="day-title">Day 5 (7/20)：悠閒早晨，滿載而歸 🏡</h3>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">08:00 - 09:00</div>
+                    <div class="activity"><span class="meal-highlight">🥞 早餐時間</span>：悠閒吃飽。<div class="badges-container auto-meal" data-type="breakfast"></div></div>
+                </div>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">09:00 - 09:30</div>
+                    <div class="activity">辦理退房，享受沒有採買壓力的早晨，慢慢推行李出發。</div>
+                </div>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">09:30 - 10:15</div>
+                    <div class="activity">搭乘 Skyliner 舒適前往 <a href="https://www.google.com/maps/search/?api=1&query=成田国際空港" target="_blank" class="map-spot">成田機場第一航廈</a> (提早抵達，時間充裕！)。
+                        <div class="badges-container">
+                            <div class="dropdown">
+                                <button class="dropbtn transport-btn">🚃 交通攻略：飯店 ➔ 機場</button>
+                                <div class="dropdown-content">
+                                    <div class="popup-header transport-header">🚇 輕鬆前往機場 (車程41分)</div>
+                                    <ul class="popup-list">
+                                        <li><div class="res-name">1. 前往京成上野站</div><div class="res-desc">沿著不忍池旁平坦的道路，推行李步行約 6 分鐘抵達「京成上野站」。</div></li>
+                                        <li><div class="res-name">2. 搭乘 Skyliner</div><div class="res-desc">搭乘事先劃好位的 Skyliner，41分鐘直達機場，讓小寶貝能在車上補眠。</div></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">10:30 - 12:00</div>
+                    <div class="activity">在機場免稅店做最後巡禮，或讓孩子在機場兒童遊戲區玩耍。</div>
+                </div>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">12:00 - 13:00</div>
+                    <div class="activity"><span class="meal-highlight">🍴 午餐時間 (嚴守12:00)</span>：於成田機場大快朵頤，吃飽準備登機。</div>
+                </div>
+                <div class="time-slot">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox"></div>
+                    <div class="time" onclick="clickTime(this)">14:25 - 17:05</div>
+                    <div class="activity">搭乘 <strong>BR197</strong> 滿載著小車車與快樂回憶飛抵台北 🏡。</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 動態產生餐飲選單與 LocalStorage 記憶腳本 -->
+    <script>
+        const menus = {
+            'breakfast': `
+                <div class="dropdown">
+                    <button class="dropbtn">🥞 早餐推薦</button>
+                    <div class="dropdown-content">
+                        <div class="popup-header">🥞 飯店周邊早餐 Top 6</div>
+                        <ul class="popup-list">
+                            <li><a href="https://maps.google.com/?q=コメダ珈琲店+上野廣小路店" target="_blank" class="res-name">☕ 客美多咖啡</a><div class="res-meta">🚶 3分 | 💰 $150</div><div class="res-desc">07:00營業，點飲料送烤吐司</div></li>
+                            <li><a href="https://maps.google.com/?q=アンデルセン+アトレ上野店" target="_blank" class="res-name">🥐 ANDERSEN 麵包店</a><div class="res-meta">🚶 8分 | 💰 $200</div><div class="res-desc">07:30營業，車站內高人氣美味</div></li>
+                            <li><a href="https://maps.google.com/?q=パークサイドカフェ+上野" target="_blank" class="res-name">🌳 The Park Side Café</a><div class="res-meta">🚶 6分 | 💰 $300</div><div class="res-desc">09:00營業，上野公園內</div></li>
+                            <li><a href="https://maps.google.com/?q=デニーズ+上野谷中店" target="_blank" class="res-name">🥞 Denny's 上野谷中店</a><div class="res-meta">🚶 10分 | 💰 $250</div><div class="res-desc">24H家庭餐廳，有兒童早餐</div></li>
+                            <li><a href="https://maps.google.com/?q=マクドナルド+上野不忍口店" target="_blank" class="res-name">🍟 麥當勞</a><div class="res-meta">🚶 5分 | 💰 $100</div><div class="res-desc">24H營業，安全牌</div></li>
+                            <li><a href="https://maps.google.com/?q=名代富士そば+上野店" target="_blank" class="res-name">🍜 名代富士蕎麥麵</a><div class="res-meta">🚶 6分 | 💰 $150</div><div class="res-desc">暖胃首選</div></li>
+                        </ul>
+                    </div>
+                </div>
+            `,
+            'lunch-dinner': `
+                <div class="dropdown">
+                    <button class="dropbtn">🍱 日式 Top 10</button>
+                    <div class="dropdown-content">
+                        <div class="popup-header">🍣 日式料理 Top 10</div>
+                        <ul class="popup-list">
+                            <li><a href="https://maps.google.com/?q=牛かつもと村+上野店" target="_blank" class="res-name">🥩 牛かつ もと村</a><div class="res-meta">🚶 6分 | 💰 $400-600</div><div class="res-desc">軟嫩炸牛排自己烤</div></li>
+                            <li><a href="https://maps.google.com/?q=とんかつ山家+上野店" target="_blank" class="res-name">🐷 とんかつ山家</a><div class="res-meta">🚶 5分 | 💰 $200-300</div><div class="res-desc">超高 CP 值炸豬排</div></li>
+                            <li><a href="https://maps.google.com/?q=一蘭+上野店" target="_blank" class="res-name">🍜 一蘭 上野店</a><div class="res-meta">🚶 7分 | 💰 $250-300</div><div class="res-desc">有兒童拉麵碗</div></li>
+                            <li><a href="https://maps.google.com/?q=三浦三崎港+上野" target="_blank" class="res-name">🍣 三浦三崎港 迴轉壽司</a><div class="res-meta">🚶 6分 | 💰 $400-800</div><div class="res-desc">迴轉軌道超吸睛</div></li>
+                            <li><a href="https://maps.google.com/?q=叙々苑+上野不忍口店" target="_blank" class="res-name">🥓 敘敘苑 燒肉</a><div class="res-meta">🚶 5分 | 💰 $1200-2500</div></li>
+                            <li><a href="https://maps.google.com/?q=名代宇奈とと+上野店" target="_blank" class="res-name">🍱 名代 宇奈とと</a><div class="res-meta">🚶 6分 | 💰 $150-300</div></li>
+                            <li><a href="https://maps.google.com/?q=肉の大山+上野" target="_blank" class="res-name">🍘 肉的大山 上野店</a><div class="res-meta">🚶 5分 | 💰 $200-400</div></li>
+                            <li><a href="https://maps.google.com/?q=らーめん鴨to葱" target="_blank" class="res-name">🍜 鴨to蔥 (Kamo to Negi)</a><div class="res-meta">🚶 5分 | 💰 $250-350</div></li>
+                            <li><a href="https://maps.google.com/?q=すしざんまい+上野店" target="_blank" class="res-name">🍣 壽司三味 上野店</a><div class="res-meta">🚶 4分 | 💰 $500-1000</div></li>
+                            <li><a href="https://maps.google.com/?q=ねぎし+上野駅前店" target="_blank" class="res-name">👅 根岸 牛舌 (Negishi)</a><div class="res-meta">🚶 7分 | 💰 $350-500</div></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <button class="dropbtn">🍛 南洋 Top 10</button>
+                    <div class="dropdown-content">
+                        <div class="popup-header">🍛 南洋料理 Top 10</div>
+                        <ul class="popup-list">
+                            <li><a href="https://maps.google.com/?q=サイアム食堂+上野" target="_blank" class="res-name">🇹🇭 Siam 食堂</a><div class="res-meta">🚶 5分 | 💰 $250-400</div></li>
+                            <li><a href="https://maps.google.com/?q=バンコクピーナッツ食堂" target="_blank" class="res-name">🇹🇭 曼谷屋</a><div class="res-meta">🚶 6分 | 💰 $200-350</div></li>
+                            <li><a href="https://maps.google.com/?q=ロータスパレス+上野" target="_blank" class="res-name">🇻🇳 Lotus Palace 上野店</a><div class="res-meta">🚶 8分 | 💰 $350-500</div></li>
+                            <li><a href="https://maps.google.com/?q=マントラ+上野" target="_blank" class="res-name">🇮🇳 Mantra 上野店</a><div class="res-meta">🚶 6分 | 💰 $250-400</div></li>
+                            <li><a href="https://maps.google.com/?q=カザナ+御徒町" target="_blank" class="res-name">🇮🇳 Khazana 御徒町店</a><div class="res-meta">🚶 7分 | 💰 $300-450</div></li>
+                            <li><a href="https://maps.google.com/?q=ブアデタイ+上野" target="_blank" class="res-name">🇹🇭 Bua de Thai</a><div class="res-meta">🚶 6分 | 💰 $300-500</div></li>
+                            <li><a href="https://maps.google.com/?q=ディップパレス+御徒町" target="_blank" class="res-name">🍛 Dippalace 御徒町店</a><div class="res-meta">🚶 5分 | 💰 $300-500</div></li>
+                            <li><a href="https://maps.google.com/?q=アメ横+東南アジアグルメ" target="_blank" class="res-name">🌶️ 阿美橫町南洋小吃街</a><div class="res-meta">🚶 5分 | 💰 $150-300</div></li>
+                            <li><a href="https://maps.google.com/?q=ヤムヤムモングト+上野" target="_blank" class="res-name">🇹🇭 Yum Yum Mongkut</a><div class="res-meta">🚶 7分 | 💰 $250-400</div></li>
+                            <li><a href="https://maps.google.com/?q=バーンパッタイ+上野" target="_blank" class="res-name">🍜 Baan Phadthai Ueno</a><div class="res-meta">🚶 7分 | 💰 $250-400</div></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <button class="dropbtn">🍝 西式 Top 10</button>
+                    <div class="dropdown-content">
+                        <div class="popup-header">🍝 西式料理 Top 10</div>
+                        <ul class="popup-list">
+                            <li><a href="https://maps.google.com/?q=サイゼリヤ+上野駅前" target="_blank" class="res-name">🍕 薩莉亞 (Saizeriya)</a><div class="res-meta">🚶 6分 | 💰 $150-250</div><div class="res-desc">極平價義式，有兒童餐</div></li>
+                            <li><a href="https://maps.google.com/?q=ロイヤルホスト+上野" target="_blank" class="res-name">🍳 Royal Host 樂雅樂</a><div class="res-meta">🚶 10分 | 💰 $350-600</div><div class="res-desc">兒童友善家庭餐廳</div></li>
+                            <li><a href="https://maps.google.com/?q=LA+COCORICO+上野" target="_blank" class="res-name">🍗 LA COCORICO 上野店</a><div class="res-meta">🚶 8分 | 💰 $400-800</div></li>
+                            <li><a href="https://maps.google.com/?q=ハードロックカフェ+上野" target="_blank" class="res-name">🍔 Hard Rock Cafe 上野</a><div class="res-meta">🚶 9分 | 💰 $600-1000</div></li>
+                            <li><a href="https://maps.google.com/?q=イタリアントマト+カフェジュニア+上野" target="_blank" class="res-name">🍝 Italian Tomato Cafe Jr.</a><div class="res-meta">🚶 5分 | 💰 $200-350</div></li>
+                            <li><a href="https://maps.google.com/?q=ミートワイナリー+上野" target="_blank" class="res-name">🥩 Meat Winery 上野店</a><div class="res-meta">🚶 6分 | 💰 $500-1000</div></li>
+                            <li><a href="https://maps.google.com/?q=ザローズアンドクラウン+上野" target="_blank" class="res-name">🍖 The Rose & Crown</a><div class="res-meta">🚶 8分 | 💰 $400-700</div></li>
+                            <li><a href="https://maps.google.com/?q=ブラボー+上野" target="_blank" class="res-name">🍕 Bravo 義大利餐廳</a><div class="res-meta">🚶 8分 | 💰 $350-550</div></li>
+                            <li><a href="https://maps.google.com/?q=プロント+上野不忍口" target="_blank" class="res-name">🍝 PRONTO 上野不忍口店</a><div class="res-meta">🚶 6分 | 💰 $200-350</div></li>
+                            <li><a href="https://maps.google.com/?q=上野精養軒+本店" target="_blank" class="res-name">🍛 上野精養軒 本店</a><div class="res-meta">🚶 7分 | 💰 $800-1500</div></li>
+                        </ul>
+                    </div>
+                </div>
+            `,
+            'late-night': `
+                <div class="dropdown">
+                    <button class="dropbtn">🍻 宵夜/外帶推薦</button>
+                    <div class="dropdown-content">
+                        <div class="popup-header">🍻 宵夜/外帶 Top 6</div>
+                        <ul class="popup-list">
+                            <li><a href="https://maps.google.com/?q=一蘭+上野店" target="_blank" class="res-name">🍜 一蘭拉麵 上野店</a><div class="res-meta">🚶 7分 | 💰 $250-300</div><div class="res-desc">24H營業，爸媽可輪班去吃</div></li>
+                            <li><a href="https://maps.google.com/?q=すしざんまい+上野店" target="_blank" class="res-name">🍣 壽司三味 上野店</a><div class="res-meta">🚶 4分 | 💰 $500-800</div><div class="res-desc">24H營業，半夜解饞救星</div></li>
+                            <li><a href="https://maps.google.com/?q=磯丸水産+上野6丁目店" target="_blank" class="res-name">🦀 磯丸水產 上野6丁目店</a><div class="res-meta">🚶 5分 | 💰 $400-600</div><div class="res-desc">也可外帶海鮮丼</div></li>
+                            <li><a href="https://maps.google.com/?q=鳥貴族+上野中央通り店" target="_blank" class="res-name">🍢 鳥貴族 上野中央通店</a><div class="res-meta">🚶 4分 | 💰 $200-400</div><div class="res-desc">高CP值串燒，可外帶</div></li>
+                            <li><a href="https://maps.google.com/?q=肉の大山+上野" target="_blank" class="res-name">🍘 肉的大山 上野店</a><div class="res-meta">🚶 5分 | 💰 $100-200</div><div class="res-desc">外帶炸肉餅超滿足</div></li>
+                            <li><a href="https://maps.google.com/?q=ドン・キホーテ+上野中央通り店" target="_blank" class="res-name">🐧 唐吉訶德 上野店</a><div class="res-meta">🚶 4分 | 💰 豐儉由人</div><div class="res-desc">買泡麵零食回飯店開睡衣趴</div></li>
+                        </ul>
+                    </div>
+                </div>
+            `
+        };
+
+        // 綁定 Checklist 狀態與 LocalStorage 儲存
+        function toggleRow(checkbox) {
+            const timeSlot = checkbox.closest('.time-slot');
+            if (checkbox.checked) { 
+                timeSlot.classList.add('checked'); 
+                localStorage.setItem(checkbox.id, 'true'); // 存入狀態
+            } else { 
+                timeSlot.classList.remove('checked'); 
+                localStorage.setItem(checkbox.id, 'false'); // 移除狀態
+            }
+        }
+        function clickTime(element) {
+            const checkbox = element.closest('.time-slot').querySelector('.row-checkbox');
+            checkbox.checked = !checkbox.checked;
+            toggleRow(checkbox);
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. 動態插入餐飲選單 HTML
+            document.querySelectorAll('.auto-meal').forEach(container => {
+                const type = container.dataset.type;
+                if (menus[type]) {
+                    container.insertAdjacentHTML('beforeend', menus[type]);
+                }
+            });
+
+            // 2. 恢復 LocalStorage 的打勾狀態
+            document.querySelectorAll('.row-checkbox').forEach((cb, index) => {
+                // 給每個 checkbox 一個獨一無二的 ID
+                cb.id = 'tokyo-trip-cb-' + index;
+                // 檢查是否曾經勾選過
+                if(localStorage.getItem(cb.id) === 'true') {
+                    cb.checked = true;
+                    cb.closest('.time-slot').classList.add('checked');
+                }
+            });
+
+            // 3. 監聽整個畫面的點擊事件 (點空白處自動關閉)
+            document.addEventListener('click', function(event) {
+                if (!event.target.matches('.dropbtn') && !event.target.closest('.dropdown-content')) {
+                    document.querySelectorAll('.dropdown-content.show').forEach(popup => popup.classList.remove('show'));
+                    document.querySelectorAll('.dropbtn.active').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.day-card').forEach(card => card.style.zIndex = '1');
+                }
+            });
+
+            // 4. 綁定所有彈出選單的點擊事件
+            document.querySelectorAll('.dropbtn').forEach(function(button) {
+                button.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    var popup = this.nextElementSibling;
+                    var isShowing = popup.classList.contains('show');
+                    
+                    // 關閉其他已開啟的
+                    document.querySelectorAll('.dropdown-content.show').forEach(p => p.classList.remove('show'));
+                    document.querySelectorAll('.dropbtn.active').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.day-card').forEach(c => c.style.zIndex = '1');
+                    
+                    // 打開目前點擊的
+                    if (!isShowing) {
+                        popup.classList.add('show');
+                        this.classList.add('active');
+                        this.closest('.day-card').style.zIndex = '10'; // 確保選單不會被下方的卡片遮住
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
