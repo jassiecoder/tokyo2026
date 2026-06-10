@@ -303,9 +303,237 @@
         }
         /* Lunch Top10 popup wider */
         .lunch-popup .dropdown-content { width: 360px; }
+
+        /* ── Dark mode ── */
+        body.dark-mode {
+            --bg-color: #0F172A;
+            --card-bg: #1E293B;
+            --text-main: #E2E8F0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+        }
+        body.dark-mode .day-card { box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+        body.dark-mode .time-slot:hover { background-color: #263148; }
+        body.dark-mode .dropdown-content { background: #1E293B; border-color: #334155; }
+        body.dark-mode .popup-list li { border-color: #334155; }
+        body.dark-mode .popup-list li:hover { background: #263148; }
+        body.dark-mode .res-desc { color: #94A3B8; }
+        body.dark-mode .res-meta { color: #64748B; }
+        body.dark-mode .info-bar { background: #0F172A; }
+        body.dark-mode .remark-block { background: linear-gradient(135deg,#1c1a0e,#221d05); border-color:#92400e; }
+        body.dark-mode .map-pin-btn { background:#1e3a5f; border-color:#2d5f9a; color:#90CDF4; }
+        body.dark-mode .day-map-strip { border-color: #334155; }
+        body.dark-mode .transit-pub { background:#0f2d45; }
+        body.dark-mode .transit-taxi { background:#2d1b00; }
+        body.dark-mode .time { color: #94A3B8; }
+        body.dark-mode .time-slot.checked .activity,
+        body.dark-mode .time-slot.checked .time { color: #475569; }
+        body.dark-mode header { background: #1E3A5F; }
+        body.dark-mode .utility-bar { background: #1E293B; border-color: #334155; }
+        body.dark-mode .util-btn { background:#263148; border-color:#334155; color:#CBD5E0; }
+        body.dark-mode .util-btn:hover { background:#2B6CB0; color:white; }
+        body.dark-mode .fx-panel { background:#1E293B; border-color:#334155; }
+        body.dark-mode .fx-input { background:#0F172A; border-color:#334155; color:#E2E8F0; }
+        body.dark-mode .fx-result { color:#68D391; }
+        body.dark-mode .pretripcard { background:#1E293B; }
+        body.dark-mode .pretripcard-header { background:#1E3A5F; }
+        body.dark-mode .pretripcheck-item { border-color:#334155; }
+        body.dark-mode .pretripcheck-item:hover { background:#263148; }
+        body.dark-mode .emergency-card { background:#1E293B; }
+        body.dark-mode .emergency-card-header { background:#742a2a; }
+        body.dark-mode .emergency-item { border-color:#334155; }
+        body.dark-mode .emergency-item:hover { background:#2d1010; }
+        body.dark-mode .timeline { border-color:#334155; }
+        body.dark-mode .day-card::before { border-color: var(--bg-color); }
+
+        /* ── Utility Bar (sticky) ── */
+        .utility-bar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: white;
+            border-bottom: 1px solid #E2E8F0;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .util-label {
+            font-size: 0.78rem;
+            color: #718096;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .util-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.3rem 0.75rem;
+            border-radius: 14px;
+            border: 1px solid #CBD5E0;
+            background: #F7FAFC;
+            color: #2D3748;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.18s;
+            white-space: nowrap;
+        }
+        .util-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .util-divider { width:1px; height:22px; background:#E2E8F0; margin: 0 2px; }
+
+        /* ── FX Panel ── */
+        .fx-panel {
+            display: none;
+            position: fixed;
+            bottom: 1.2rem;
+            right: 1.2rem;
+            z-index: 9999;
+            background: white;
+            border: 1px solid #CBD5E0;
+            border-radius: 14px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            padding: 1rem 1.2rem;
+            width: 220px;
+        }
+        .fx-panel.open { display: block; }
+        .fx-title { font-size: 0.85rem; font-weight: 700; color: #2D3748; margin-bottom: 0.6rem; }
+        .fx-row { display: flex; gap: 0.4rem; align-items: center; margin-bottom: 0.5rem; }
+        .fx-input {
+            flex: 1; border: 1px solid #CBD5E0; border-radius: 8px;
+            padding: 0.35rem 0.6rem; font-size: 0.9rem; width: 100%;
+        }
+        .fx-label { font-size: 0.78rem; color: #718096; }
+        .fx-result { font-size: 1.1rem; font-weight: 700; color: #276749; margin-top: 0.3rem; }
+        .fx-rate { font-size: 0.72rem; color: #A0AEC0; margin-top: 0.2rem; }
+        .fx-close { float: right; cursor: pointer; color: #A0AEC0; font-size: 1rem; line-height:1; }
+
+        /* ── Weather shortcut ── */
+        .weather-links { display:flex; gap:0.4rem; flex-wrap:wrap; }
+
+        /* ── Pre-trip Checklist Card ── */
+        .pretripcard {
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .pretripcard-header {
+            background: #2B6CB0;
+            color: white;
+            padding: 0.9rem 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+        .pretripcard-title { font-size: 1.1rem; font-weight: 700; }
+        .pretripcard-body { padding: 0.8rem 1.4rem 1.2rem; display: none; }
+        .pretripcard-body.open { display: block; }
+        .pretripcard-body.open + .pretripcard-header .toggle-icon,
+        .pretripcard-header .toggle-icon { transition: transform 0.2s; }
+        .pretripcard-section { font-size: 0.78rem; font-weight: 700; color: #718096; letter-spacing: 0.05em; text-transform: uppercase; margin: 0.9rem 0 0.4rem; }
+        .pretripcheck-item {
+            display: flex; align-items: flex-start; gap: 0.7rem;
+            padding: 0.5rem 0.4rem; border-bottom: 1px solid #F0F4F8;
+            cursor: pointer; border-radius: 4px; transition: background 0.15s;
+        }
+        .pretripcheck-item:hover { background: #F7FAFC; }
+        .pretripcheck-item:last-child { border-bottom: none; }
+        .pretripcheck-item input { margin-top:0.15rem; flex-shrink:0; width:1.1rem; height:1.1rem; accent-color: #2B6CB0; cursor:pointer; }
+        .pretripcheck-text { font-size: 0.88rem; line-height:1.5; }
+        .pretripcheck-text.done { text-decoration: line-through; color: #A0AEC0; }
+        .pretripcheck-link { font-size: 0.78rem; color: #3182CE; text-decoration: none; }
+        .pretripcheck-link:hover { text-decoration: underline; }
+        .pretripcard-progress { font-size: 0.8rem; color: rgba(255,255,255,0.8); }
+
+        /* ── Emergency Card ── */
+        .emergency-card {
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .emergency-card-header {
+            background: #C53030;
+            color: white;
+            padding: 0.9rem 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+        .emergency-card-title { font-size: 1.1rem; font-weight: 700; }
+        .emergency-body { padding: 0.5rem 1.4rem 1rem; display: none; }
+        .emergency-body.open { display: block; }
+        .emergency-section { font-size: 0.78rem; font-weight: 700; color: #718096; letter-spacing: 0.05em; margin: 0.8rem 0 0.3rem; }
+        .emergency-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0.55rem 0.3rem; border-bottom: 1px solid #F0F4F8;
+            font-size: 0.88rem; gap: 0.6rem;
+        }
+        .emergency-item:last-child { border-bottom: none; }
+        .emergency-item:hover { background: #FFF5F5; border-radius: 4px; }
+        .emergency-name { font-weight: 600; color: #2D3748; flex: 1; }
+        .emergency-num {
+            font-weight: 700; color: #C53030;
+            background: #FFF5F5; border: 1px solid #FEB2B2;
+            padding: 0.2rem 0.6rem; border-radius: 8px;
+            font-size: 0.85rem; white-space: nowrap; text-decoration: none;
+        }
+        .emergency-num:hover { background: #C53030; color: white; }
+        .emergency-desc { font-size: 0.78rem; color: #718096; margin-top: 0.1rem; }
+        .copy-btn {
+            font-size: 0.72rem; color: #3182CE; cursor: pointer;
+            background: none; border: none; padding: 0.1rem 0.3rem;
+            border-radius: 4px; transition: background 0.15s;
+        }
+        .copy-btn:hover { background: #EBF8FF; }
     </style>
 </head>
 <body>
+    
+    <!-- ── Utility Bar ── -->
+    <div class="utility-bar" id="utilityBar">
+        <span class="util-label">快速工具</span>
+        <button class="util-btn" onclick="document.getElementById('pretripAnchor').scrollIntoView({behavior:'smooth'})">📋 出發前清單</button>
+        <button class="util-btn" onclick="document.getElementById('emergencyAnchor').scrollIntoView({behavior:'smooth'})">🆘 緊急資訊</button>
+        <div class="util-divider"></div>
+        <button class="util-btn" onclick="toggleFX()">💴 日圓換算</button>
+        <div class="util-divider"></div>
+        <span class="util-label">天氣</span>
+        <a class="util-btn" href="https://www.jma.go.jp/bosai/forecast/#area_type=offices&area_code=130000" target="_blank">🌤️ 東京天氣 (JMA)</a>
+        <a class="util-btn" href="https://www.accuweather.com/ja/jp/tokyo/226396/daily-weather-forecast/226396" target="_blank">📱 AccuWeather</a>
+        <div class="util-divider"></div>
+        <button class="util-btn" onclick="toggleDark()" id="darkBtn">🌙 深色模式</button>
+    </div>
+
+    <!-- ── FX Floating Panel ── -->
+    <div class="fx-panel" id="fxPanel">
+        <div class="fx-title">💴 日圓 ↔ 台幣換算 <span class="fx-close" onclick="toggleFX()">✕</span></div>
+        <div class="fx-label">輸入日圓 (¥)</div>
+        <div class="fx-row">
+            <input class="fx-input" id="fxJPY" type="number" placeholder="例：2000" oninput="calcFX()">
+        </div>
+        <div class="fx-label">換算台幣 (NT$)</div>
+        <div class="fx-result" id="fxTWD">—</div>
+        <div class="fx-rate" id="fxRateLabel">匯率載入中…</div>
+        <hr style="border:none;border-top:1px solid #E2E8F0;margin:0.6rem 0">
+        <div class="fx-label">輸入台幣 (NT$)</div>
+        <div class="fx-row">
+            <input class="fx-input" id="fxTWDin" type="number" placeholder="例：500" oninput="calcFX2()">
+        </div>
+        <div class="fx-label">換算日圓 (¥)</div>
+        <div class="fx-result" id="fxJPYout">—</div>
+    </div>
+
     <header>
         <h1>東京五日遊 - 車車與愛情故事特輯</h1>
         <div class="subtitle">打勾永久記憶 ｜ 超詳細交通攻略 ｜ 全連結地圖</div>
@@ -314,7 +542,198 @@
         📅 7/16 - 7/20 &nbsp;|&nbsp; ✈️ BR196 & BR197 &nbsp;|&nbsp; 🏨 &Here Ueno Tokyo &nbsp;|&nbsp; 🕛 午餐嚴守 12:00
     </div>
 
+
     <div class="container">
+        <!-- ── Pre-trip Checklist Card ── -->
+        <div id="pretripAnchor" class="pretripcard">
+            <div class="pretripcard-header" onclick="togglePretrip()">
+                <div>
+                    <div class="pretripcard-title">📋 出發前必辦清單</div>
+                    <div style="font-size:0.82rem;opacity:0.85;margin-top:2px">出發 7/16 前確認完畢 — 點擊展開</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:1rem">
+                    <span class="pretripcard-progress" id="pretripProgress">0 / 18</span>
+                    <span class="toggle-icon" id="pretripIcon">▼</span>
+                </div>
+            </div>
+            <div class="pretripcard-body" id="pretripBody">
+                <div class="pretripcard-section">🎫 訂票 & 票券</div>
+                <div class="pretripcheck-item" onclick="togglePre(this)">
+                    <input type="checkbox" class="pre-check" id="pre-1">
+                    <div><div class="pretripcheck-text">✈️ EVA Air BR196 出發班機確認（7/16 15:20 TPE → NRT 19:40）</div><a href="https://www.evaair.com/zh-tw/" target="_blank" class="pretripcheck-link">EVA Air 官網查詢 →</a></div>
+                </div>
+                <div class="pretripcheck-item" onclick="togglePre(this)">
+                    <input type="checkbox" class="pre-check" id="pre-2">
+                    <div><div class="pretripcheck-text">✈️ EVA Air BR197 回程班機確認（7/20 14:25 NRT → TPE 17:05）</div></div>
+                </div>
+                <div class="pretripcheck-item" onclick="togglePre(this)">
+                    <input type="checkbox" class="pre-check" id="pre-3">
+                    <div><div class="pretripcheck-text">🚃 Skyliner 預訂 × 2 張（去程 + 回程，建議事先劃位）</div><a href="https://www.keisei.co.jp/keisei/tetudou/skyliner/tc/index.php" target="_blank" class="pretripcheck-link">京成官網購票 →</a></div>
+                </div>
+                <div class="pretripcheck-item" onclick="togglePre(this)">
+                    <input type="checkbox" class="pre-check" id="pre-4">
+                    <div><div class="pretripcheck-text">🗼 東京鐵塔 Main Deck 門票（可現場，但暑假建議預購）</div><a href="https://www.tokyotower.co.jp/fee/" target="_blank" class="pretripcheck-link">東京鐵塔官網 →</a></div>
+                </div>
+                <div class="pretripcheck-item" onclick="togglePre(this)">
+                    <input type="checkbox" class="pre-check" id="pre-5">
+                    <div><div class="pretripcheck-text">🐳 墨田水族館門票（暑假人多，建議線上預購）</div><a href="https://www.sumida-aquarium.com/" target="_blank" class="pretripcheck-link">水族館官網 →</a></div>
+                </div>
+                <div class="pretripcheck-section" style="margin-top:0.7rem;font-size:0.78rem;font-weight:700;color:#718096;letter-spacing:0.05em;">📱 通訊 & 導航</div>
+                <div class="pretripcheck-item" onclick="togglePre(this)">
+                    <input type="checkbox" class="pre-check" id="pre-6">
+                    <div><div class="pretripcheck-text">📶 日本 eSIM 或實體 SIM 卡購買（建議 IIJmio / KDDI）</div><a href="https://www.kkday.com/zh-tw/category/12065" target="_blank" class="pretripcheck-link">KKday SIM 卡 →</a></div>
+                </div>
+                <div class="pretripcheck-item" onclick="togglePre(this)">
+                    <input type="checkbox" class="pre-check" id="pre-7">
+                    <div><div class="pretripcheck-text">🗺️ Google Maps 離線地圖下載（東京市區、成田機場區域）</div></div>
+                </div>
+                <div class="pretripcheck-item" onclick="togglePre(this)">
+                    <input type="checkbox" class="pre-check" id="pre-8">
+                    <div><div class="pretripcheck-text">🚇 乘換案内 App 安裝（iOS / Android，最準確的東京地鐵查詢）</div><a href="https://apps.apple.com/tw/app/%E4%B9%97%E6%8F%9B%E6%A1%88%E5%86%85/id299490481" target="_blank" class="pretripcheck-link">App Store →</a></div>
+                </div>
+                <div class="pretripcheck-item" onclick="togglePre(this)">
+                    <input type="checkbox" class="pre-check" id="pre-9">
+                    <div><div class="pretripcheck-text">💳 Suica / ICOCA 卡或 Apple Pay Suica 設定（地鐵、便利商店通用）</div></div>
+                </div>
+                <div class="pretripcard-section">💰 金錢 & 保險</div>
+                <div class="pretripcheck-item" onclick="togglePre(this)">
+                    <input type="checkbox" class="pre-check" id="pre-10">
+                    <div><div class="pretripcheck-text">💴 日幣現金換匯（建議帶約 ¥50,000–80,000 現金備用）</div></div>
+                </div>
+                <div class="pretripcheck-item" onclick="togglePre(this)">
+                    <input type="checkbox" class="pre-check" id="pre-11">
+                    <div><div class="pretripcheck-text">🛡️ 旅遊平安險 & 不便險投保（含孩子）</div></div>
+                </div>
+                <div class="pretripcheck-item" onclick="togglePre(this)">
+                    <input type="checkbox" class="pre-check" id="pre-12">
+                    <div><div class="pretripcheck-text">💳 信用卡海外刷卡通知設定 & 確認海外提款功能</div></div>
+                </div>
+                <div class="pretripcard-section">🧳 行李 & 準備</div>
+                <div class="pretripcheck-item" onclick="togglePre(this)">
+                    <input type="checkbox" class="pre-check" id="pre-13">
+                    <div><div class="pretripcheck-text">🌡️ 7 月東京均溫 27-33°C，帶薄外套（室內冷氣強）、防曬、雨傘</div></div>
+                </div>
+                <div class="pretripcheck-item" onclick="togglePre(this)">
+                    <input type="checkbox" class="pre-check" id="pre-14">
+                    <div><div class="pretripcheck-text">👶 孩子備品：濕紙巾、備用衣物 ×2、常備藥、遮陽帽</div></div>
+                </div>
+                <div class="pretripcheck-item" onclick="togglePre(this)">
+                    <input type="checkbox" class="pre-check" id="pre-15">
+                    <div><div class="pretripcheck-text">📄 護照有效期確認（需距出發日 6 個月以上）</div></div>
+                </div>
+                <div class="pretripcard-section">🏨 飯店 & 確認</div>
+                <div class="pretripcheck-item" onclick="togglePre(this)">
+                    <input type="checkbox" class="pre-check" id="pre-16">
+                    <div><div class="pretripcheck-text">🏨 &Here Ueno Tokyo 入住確認信 & 地址截圖（給計程車用）</div><a href="https://www.google.com/maps/search/?api=1&query=&Here+Ueno+Tokyo" target="_blank" class="pretripcheck-link">飯店地圖 →</a></div>
+                </div>
+                <div class="pretripcheck-item" onclick="togglePre(this)">
+                    <input type="checkbox" class="pre-check" id="pre-17">
+                    <div><div class="pretripcheck-text">🧳 行李超限確認（EVA Air 經濟艙：23kg ×2 + 手提 7kg）</div></div>
+                </div>
+                <div class="pretripcheck-item" onclick="togglePre(this)">
+                    <input type="checkbox" class="pre-check" id="pre-18">
+                    <div><div class="pretripcheck-text">📸 相機電池 / 行動電源充滿電，記憶卡空間確認</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Emergency Card ── -->
+        <div id="emergencyAnchor" class="emergency-card">
+            <div class="emergency-card-header" onclick="toggleEmergency()">
+                <div>
+                    <div class="emergency-card-title">🆘 緊急聯絡資訊</div>
+                    <div style="font-size:0.82rem;opacity:0.85;margin-top:2px">出事不慌 — 點擊展開</div>
+                </div>
+                <span id="emergencyIcon">▼</span>
+            </div>
+            <div class="emergency-body" id="emergencyBody">
+                <div class="emergency-section">🚨 日本緊急號碼</div>
+                <div class="emergency-item">
+                    <div>
+                        <div class="emergency-name">🚒 火災 / 救護車</div>
+                        <div class="emergency-desc">Fire & Ambulance — 撥打即有中文協助服務</div>
+                    </div>
+                    <a href="tel:119" class="emergency-num">119</a>
+                </div>
+                <div class="emergency-item">
+                    <div>
+                        <div class="emergency-name">🚓 警察</div>
+                        <div class="emergency-desc">Police — 遺失護照、遭竊、事故</div>
+                    </div>
+                    <a href="tel:110" class="emergency-num">110</a>
+                </div>
+                <div class="emergency-item">
+                    <div>
+                        <div class="emergency-name">📞 外國人諮詢（24H）</div>
+                        <div class="emergency-desc">Japan Visitor Hotline — 中文、英文、韓文均可</div>
+                    </div>
+                    <a href="tel:0570-073-202" class="emergency-num">0570-073-202</a>
+                </div>
+
+                <div class="emergency-section">🇹🇼 台灣在日機構</div>
+                <div class="emergency-item">
+                    <div>
+                        <div class="emergency-name">🏛️ 台北駐日經濟文化辦事處（東京）</div>
+                        <div class="emergency-desc">護照遺失補發、緊急協助 — 平日 09:00–12:30 / 13:30–17:00</div>
+                    </div>
+                    <a href="tel:03-3280-7811" class="emergency-num">03-3280-7811</a>
+                </div>
+                <div class="emergency-item">
+                    <div>
+                        <div class="emergency-name">🌙 駐日辦事處緊急專線（非辦公時間）</div>
+                        <div class="emergency-desc">護照遺失、人身安全等緊急事件</div>
+                    </div>
+                    <a href="tel:03-3280-7917" class="emergency-num">03-3280-7917</a>
+                </div>
+
+                <div class="emergency-section">🏨 飯店 & 交通</div>
+                <div class="emergency-item">
+                    <div>
+                        <div class="emergency-name">🏨 &Here Ueno Tokyo</div>
+                        <div class="emergency-desc">東京都台東区上野 4-9-5 — Check-in: 15:00 / Check-out: 11:00</div>
+                    </div>
+                    <a href="tel:03-5816-3100" class="emergency-num">03-5816-3100</a>
+                </div>
+                <div class="emergency-item">
+                    <div>
+                        <div class="emergency-name">🚃 京成電鐵（Skyliner 問題）</div>
+                        <div class="emergency-desc">Skyliner 誤點、票務問題</div>
+                    </div>
+                    <a href="tel:0570-081-160" class="emergency-num">0570-081-160</a>
+                </div>
+                <div class="emergency-item">
+                    <div>
+                        <div class="emergency-name">🏥 東京都醫療諮詢（中文）</div>
+                        <div class="emergency-desc">就醫指引、最近醫院查詢 — 24H</div>
+                    </div>
+                    <a href="tel:03-5285-8181" class="emergency-num">03-5285-8181</a>
+                </div>
+                <div class="emergency-item">
+                    <div>
+                        <div class="emergency-name">✈️ EVA Air 緊急服務（日本）</div>
+                        <div class="emergency-desc">班機問題、遺失行李</div>
+                    </div>
+                    <a href="tel:0120-175-030" class="emergency-num">0120-175-030</a>
+                </div>
+
+                <div class="emergency-section">📍 重要地址（截圖備用）</div>
+                <div class="emergency-item">
+                    <div>
+                        <div class="emergency-name">🏨 飯店地址（日文）</div>
+                        <div class="emergency-desc">東京都台東区上野4丁目9番5号 — 給計程車司機看</div>
+                    </div>
+                    <button class="copy-btn" onclick="copyText('東京都台東区上野4丁目9番5号')">複製</button>
+                </div>
+                <div class="emergency-item">
+                    <div>
+                        <div class="emergency-name">🏛️ 台北駐日辦地址（日文）</div>
+                        <div class="emergency-desc">東京都港区白金台5丁目20番2号</div>
+                    </div>
+                    <button class="copy-btn" onclick="copyText('東京都港区白金台5丁目20番2号')">複製</button>
+                </div>
+            </div>
+        </div>
+
         <div class="timeline">
 
             <!-- Day 1 -->
@@ -1269,6 +1688,77 @@
         return html;
     }
 
+
+    // ── Dark Mode ──
+    function toggleDark() {
+        const isDark = document.body.classList.toggle('dark-mode');
+        storage.set('darkMode', isDark ? '1' : '0');
+        document.getElementById('darkBtn').textContent = isDark ? '☀️ 亮色模式' : '🌙 深色模式';
+    }
+
+    // ── FX Panel ──
+    let fxRate = 0.21; // fallback TWD per JPY
+    fetch('https://api.frankfurter.app/latest?from=JPY&to=TWD')
+        .then(r => r.json())
+        .then(d => {
+            fxRate = d.rates.TWD;
+            document.getElementById('fxRateLabel').textContent = '1 JPY ≈ ' + fxRate.toFixed(4) + ' TWD (即時匯率)';
+        })
+        .catch(() => {
+            document.getElementById('fxRateLabel').textContent = '1 JPY ≈ 0.21 TWD (備用匯率)';
+        });
+
+    function toggleFX() {
+        document.getElementById('fxPanel').classList.toggle('open');
+    }
+    function calcFX() {
+        const jpy = parseFloat(document.getElementById('fxJPY').value);
+        document.getElementById('fxTWD').textContent = isNaN(jpy) ? '—' : 'NT$ ' + (jpy * fxRate).toFixed(0);
+    }
+    function calcFX2() {
+        const twd = parseFloat(document.getElementById('fxTWDin').value);
+        document.getElementById('fxJPYout').textContent = isNaN(twd) || fxRate===0 ? '—' : '¥ ' + (twd / fxRate).toFixed(0);
+    }
+
+    // ── Pre-trip Checklist ──
+    function togglePretrip() {
+        const body = document.getElementById('pretripBody');
+        const icon = document.getElementById('pretripIcon');
+        body.classList.toggle('open');
+        icon.textContent = body.classList.contains('open') ? '▲' : '▼';
+    }
+    function togglePre(item) {
+        if (event.target.tagName === 'A') return;
+        const cb = item.querySelector('.pre-check');
+        if (event.target !== cb) cb.checked = !cb.checked;
+        const txt = item.querySelector('.pretripcheck-text');
+        txt.classList.toggle('done', cb.checked);
+        storage.set(cb.id, cb.checked ? '1' : '0');
+        updatePretripProgress();
+    }
+    function updatePretripProgress() {
+        const all = document.querySelectorAll('.pre-check');
+        const done = [...all].filter(c => c.checked).length;
+        document.getElementById('pretripProgress').textContent = done + ' / ' + all.length;
+    }
+
+    // ── Emergency Toggle ──
+    function toggleEmergency() {
+        const body = document.getElementById('emergencyBody');
+        const icon = document.getElementById('emergencyIcon');
+        body.classList.toggle('open');
+        icon.textContent = body.classList.contains('open') ? '▲' : '▼';
+    }
+
+    // ── Copy to clipboard ──
+    function copyText(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert('已複製：' + text);
+        }).catch(() => {
+            prompt('請手動複製：', text);
+        });
+    }
+
     // FIX: Safe localStorage wrapper — handles private mode exceptions
     const storage = {
         get(key) {
@@ -1335,6 +1825,23 @@
                 el.innerHTML = generateMealHTML(loc, meal);
             }
         });
+
+        // Restore dark mode
+        if (storage.get('darkMode') === '1') {
+            document.body.classList.add('dark-mode');
+            const btn = document.getElementById('darkBtn');
+            if (btn) btn.textContent = '☀️ 亮色模式';
+        }
+
+        // Restore pre-trip checklist state
+        document.querySelectorAll('.pre-check').forEach(function(cb) {
+            if (storage.get(cb.id) === '1') {
+                cb.checked = true;
+                const txt = cb.closest('.pretripcheck-item')?.querySelector('.pretripcheck-text');
+                if (txt) txt.classList.add('done');
+            }
+        });
+        updatePretripProgress();
 
         // Load saved checklist state
         document.querySelectorAll('.row-checkbox').forEach(function(checkbox) {
