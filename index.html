@@ -391,7 +391,7 @@
             position: fixed;
             bottom: 1.2rem;
             right: 1.2rem;
-            z-index: 9999;
+            z-index: 100000;
             background: white;
             border: 1px solid #CBD5E0;
             border-radius: 14px;
@@ -496,6 +496,56 @@
             border-radius: 4px; transition: background 0.15s;
         }
         .copy-btn:hover { background: #EBF8FF; }
+
+        /* ── Current time slot highlight ── */
+        .time-slot.now {
+            background: linear-gradient(90deg, #EBF8FF 0%, #FFFFFF 100%);
+            border-left: 4px solid #2B6CB0;
+            box-shadow: 0 0 0 1px #90CDF4, 0 4px 14px rgba(43,108,176,0.18);
+            border-radius: 8px;
+        }
+        .time-slot.now .time { color: #2B6CB0; font-weight: 800; }
+        .now-badge {
+            display: inline-block;
+            background: #2B6CB0;
+            color: white;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 8px;
+            vertical-align: middle;
+            animation: nowPulse 2s ease-in-out infinite;
+        }
+        @keyframes nowPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.55; }
+        }
+        body.dark-mode .time-slot.now {
+            background: linear-gradient(90deg, #1e3a5f 0%, #1E293B 100%);
+            box-shadow: 0 0 0 1px #2d5f9a, 0 4px 14px rgba(43,108,176,0.35);
+        }
+
+        /* ── Cafe popup (green) ── */
+        .cafe-btn {
+            background-color: #F0FFF4;
+            color: #276749;
+            border-color: #9AE6B4;
+        }
+        .cafe-trigger.popup-active .cafe-btn {
+            background-color: #276749;
+            color: white;
+            border-color: #276749;
+        }
+        .cafe-header { background: #276749; }
+        .cafe-rank {
+            display:inline-block; min-width:1.3rem; height:1.3rem; line-height:1.3rem;
+            text-align:center; background:#276749; color:white; border-radius:50%;
+            font-size:0.72rem; font-weight:700; margin-right:5px;
+        }
+        body.dark-mode .cafe-btn { background:#0f2818; color:#9AE6B4; border-color:#276749; }
+        body.dark-mode .cafe-trigger.popup-active .cafe-btn { background:#276749; color:white; }
     </style>
 </head>
 <body>
@@ -506,6 +556,7 @@
         <button class="util-btn" onclick="document.getElementById('pretripAnchor').scrollIntoView({behavior:'smooth'})">📋 出發前清單</button>
         <button class="util-btn" onclick="document.getElementById('emergencyAnchor').scrollIntoView({behavior:'smooth'})">🆘 緊急資訊</button>
         <div class="util-divider"></div>
+        <button class="util-btn" onclick="scrollToNow()" id="nowBtn" style="display:none">🕐 現在行程</button>
         <button class="util-btn" onclick="toggleFX()">💴 日圓換算</button>
         <div class="util-divider"></div>
         <span class="util-label">天氣</span>
@@ -552,85 +603,93 @@
                     <div style="font-size:0.82rem;opacity:0.85;margin-top:2px">出發 7/16 前確認完畢 — 點擊展開</div>
                 </div>
                 <div style="display:flex;align-items:center;gap:1rem">
-                    <span class="pretripcard-progress" id="pretripProgress">0 / 18</span>
+                    <span class="pretripcard-progress" id="pretripProgress">0 / 20</span>
                     <span class="toggle-icon" id="pretripIcon">▼</span>
                 </div>
             </div>
             <div class="pretripcard-body" id="pretripBody">
                 <div class="pretripcard-section">🎫 訂票 & 票券</div>
-                <div class="pretripcheck-item" onclick="togglePre(this)">
+                <div class="pretripcheck-item" onclick="togglePre(this, event)">
                     <input type="checkbox" class="pre-check" id="pre-1">
                     <div><div class="pretripcheck-text">✈️ EVA Air BR196 出發班機確認（7/16 15:20 TPE → NRT 19:40）</div><a href="https://www.evaair.com/zh-tw/" target="_blank" class="pretripcheck-link">EVA Air 官網查詢 →</a></div>
                 </div>
-                <div class="pretripcheck-item" onclick="togglePre(this)">
+                <div class="pretripcheck-item" onclick="togglePre(this, event)">
                     <input type="checkbox" class="pre-check" id="pre-2">
                     <div><div class="pretripcheck-text">✈️ EVA Air BR197 回程班機確認（7/20 14:25 NRT → TPE 17:05）</div></div>
                 </div>
-                <div class="pretripcheck-item" onclick="togglePre(this)">
+                <div class="pretripcheck-item" onclick="togglePre(this, event)">
                     <input type="checkbox" class="pre-check" id="pre-3">
                     <div><div class="pretripcheck-text">🚃 Skyliner 預訂 × 2 張（去程 + 回程，建議事先劃位）</div><a href="https://www.keisei.co.jp/keisei/tetudou/skyliner/tc/index.php" target="_blank" class="pretripcheck-link">京成官網購票 →</a></div>
                 </div>
-                <div class="pretripcheck-item" onclick="togglePre(this)">
+                <div class="pretripcheck-item" onclick="togglePre(this, event)">
                     <input type="checkbox" class="pre-check" id="pre-4">
                     <div><div class="pretripcheck-text">🗼 東京鐵塔 Main Deck 門票（可現場，但暑假建議預購）</div><a href="https://www.tokyotower.co.jp/fee/" target="_blank" class="pretripcheck-link">東京鐵塔官網 →</a></div>
                 </div>
-                <div class="pretripcheck-item" onclick="togglePre(this)">
+                <div class="pretripcheck-item" onclick="togglePre(this, event)">
                     <input type="checkbox" class="pre-check" id="pre-5">
                     <div><div class="pretripcheck-text">🐳 墨田水族館門票（暑假人多，建議線上預購）</div><a href="https://www.sumida-aquarium.com/" target="_blank" class="pretripcheck-link">水族館官網 →</a></div>
                 </div>
+                <div class="pretripcheck-item" onclick="togglePre(this, event)">
+                    <input type="checkbox" class="pre-check" id="pre-19">
+                    <div><div class="pretripcheck-text">✨ <strong>teamLab Borderless 門票（7/18 週六 14:30 場次）</strong>——日時指定預約制，週六極易完售，<span style="color:#E53E3E;font-weight:700">最優先預訂</span>！兒童 ¥1,500 / 大人 ¥3,800 起</div><a href="https://borderless.teamlab.art/jp/" target="_blank" class="pretripcheck-link">teamLab 官網訂票 →</a></div>
+                </div>
+                <div class="pretripcheck-item" onclick="togglePre(this, event)">
+                    <input type="checkbox" class="pre-check" id="pre-20">
+                    <div><div class="pretripcheck-text">✈️ <strong>確認 BicCamera 哩程方案</strong>：向 EVA 確認「秋葉原店」（Day 4 行程）在無限萬哩遊指定分店名單內，若不在則改有楽町店 + 記下會員卡號（結帳出示用）</div><a href="https://www.evaair.com/zh-tw/infinity-mileagelands/" target="_blank" class="pretripcheck-link">EVA 無限萬哩遊 →</a></div>
+                </div>
                 <div class="pretripcheck-section" style="margin-top:0.7rem;font-size:0.78rem;font-weight:700;color:#718096;letter-spacing:0.05em;">📱 通訊 & 導航</div>
-                <div class="pretripcheck-item" onclick="togglePre(this)">
+                <div class="pretripcheck-item" onclick="togglePre(this, event)">
                     <input type="checkbox" class="pre-check" id="pre-6">
                     <div><div class="pretripcheck-text">📶 日本 eSIM 或實體 SIM 卡購買（建議 IIJmio / KDDI）</div><a href="https://www.kkday.com/zh-tw/category/12065" target="_blank" class="pretripcheck-link">KKday SIM 卡 →</a></div>
                 </div>
-                <div class="pretripcheck-item" onclick="togglePre(this)">
+                <div class="pretripcheck-item" onclick="togglePre(this, event)">
                     <input type="checkbox" class="pre-check" id="pre-7">
                     <div><div class="pretripcheck-text">🗺️ Google Maps 離線地圖下載（東京市區、成田機場區域）</div></div>
                 </div>
-                <div class="pretripcheck-item" onclick="togglePre(this)">
+                <div class="pretripcheck-item" onclick="togglePre(this, event)">
                     <input type="checkbox" class="pre-check" id="pre-8">
                     <div><div class="pretripcheck-text">🚇 乘換案内 App 安裝（iOS / Android，最準確的東京地鐵查詢）</div><a href="https://apps.apple.com/tw/app/%E4%B9%97%E6%8F%9B%E6%A1%88%E5%86%85/id299490481" target="_blank" class="pretripcheck-link">App Store →</a></div>
                 </div>
-                <div class="pretripcheck-item" onclick="togglePre(this)">
+                <div class="pretripcheck-item" onclick="togglePre(this, event)">
                     <input type="checkbox" class="pre-check" id="pre-9">
                     <div><div class="pretripcheck-text">💳 Suica / ICOCA 卡或 Apple Pay Suica 設定（地鐵、便利商店通用）</div></div>
                 </div>
                 <div class="pretripcard-section">💰 金錢 & 保險</div>
-                <div class="pretripcheck-item" onclick="togglePre(this)">
+                <div class="pretripcheck-item" onclick="togglePre(this, event)">
                     <input type="checkbox" class="pre-check" id="pre-10">
                     <div><div class="pretripcheck-text">💴 日幣現金換匯（建議帶約 ¥50,000–80,000 現金備用）</div></div>
                 </div>
-                <div class="pretripcheck-item" onclick="togglePre(this)">
+                <div class="pretripcheck-item" onclick="togglePre(this, event)">
                     <input type="checkbox" class="pre-check" id="pre-11">
                     <div><div class="pretripcheck-text">🛡️ 旅遊平安險 & 不便險投保（含孩子）</div></div>
                 </div>
-                <div class="pretripcheck-item" onclick="togglePre(this)">
+                <div class="pretripcheck-item" onclick="togglePre(this, event)">
                     <input type="checkbox" class="pre-check" id="pre-12">
                     <div><div class="pretripcheck-text">💳 信用卡海外刷卡通知設定 & 確認海外提款功能</div></div>
                 </div>
                 <div class="pretripcard-section">🧳 行李 & 準備</div>
-                <div class="pretripcheck-item" onclick="togglePre(this)">
+                <div class="pretripcheck-item" onclick="togglePre(this, event)">
                     <input type="checkbox" class="pre-check" id="pre-13">
                     <div><div class="pretripcheck-text">🌡️ 7 月東京均溫 27-33°C，帶薄外套（室內冷氣強）、防曬、雨傘</div></div>
                 </div>
-                <div class="pretripcheck-item" onclick="togglePre(this)">
+                <div class="pretripcheck-item" onclick="togglePre(this, event)">
                     <input type="checkbox" class="pre-check" id="pre-14">
                     <div><div class="pretripcheck-text">👶 孩子備品：濕紙巾、備用衣物 ×2、常備藥、遮陽帽</div></div>
                 </div>
-                <div class="pretripcheck-item" onclick="togglePre(this)">
+                <div class="pretripcheck-item" onclick="togglePre(this, event)">
                     <input type="checkbox" class="pre-check" id="pre-15">
                     <div><div class="pretripcheck-text">📄 護照有效期確認（需距出發日 6 個月以上）</div></div>
                 </div>
                 <div class="pretripcard-section">🏨 飯店 & 確認</div>
-                <div class="pretripcheck-item" onclick="togglePre(this)">
+                <div class="pretripcheck-item" onclick="togglePre(this, event)">
                     <input type="checkbox" class="pre-check" id="pre-16">
                     <div><div class="pretripcheck-text">🏨 &Here Ueno Tokyo 入住確認信 & 地址截圖（給計程車用）</div><a href="https://www.google.com/maps/search/?api=1&query=&Here+Ueno+Tokyo" target="_blank" class="pretripcheck-link">飯店地圖 →</a></div>
                 </div>
-                <div class="pretripcheck-item" onclick="togglePre(this)">
+                <div class="pretripcheck-item" onclick="togglePre(this, event)">
                     <input type="checkbox" class="pre-check" id="pre-17">
                     <div><div class="pretripcheck-text">🧳 行李超限確認（EVA Air 經濟艙：23kg ×2 + 手提 7kg）</div></div>
                 </div>
-                <div class="pretripcheck-item" onclick="togglePre(this)">
+                <div class="pretripcheck-item" onclick="togglePre(this, event)">
                     <input type="checkbox" class="pre-check" id="pre-18">
                     <div><div class="pretripcheck-text">📸 相機電池 / 行動電源充滿電，記憶卡空間確認</div></div>
                 </div>
@@ -772,6 +831,41 @@
                     <div class="time" onclick="clickTime(this)">20:30 - 21:30</div>
                     <div class="activity">
                         領完行李後，搭乘直達車前往飯店 <a href="https://www.google.com/maps/search/?api=1&query=&Here+Ueno+Tokyo" target="_blank" class="map-spot">&Here Ueno Tokyo</a> 辦理入住。
+                        <div class="meal-badges" style="margin-top:0.4rem;">
+                            <div class="dropdown cafe-trigger restaurant-trigger" onclick="togglePopup(event, this)">
+                                <div class="dropbtn cafe-btn">☕ 附近咖啡廳 Top 5（上野）</div>
+                                <div class="dropdown-content">
+                                    <div class="popup-header cafe-header">☕ 上野 高評價咖啡廳 Top 5</div>
+                                    <ul class="popup-list">
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E4%B8%8A%E9%87%8E%E3%82%B0%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B5%E3%83%AD%E3%83%B3%20%E4%B8%8A%E9%87%8E%E5%85%AC%E5%9C%92" target="_blank" class="res-name"><span class="cafe-rank">1</span>上野グリーンサロン</a>
+                                            <div class="res-meta">🚶 步行約 5 分 | <span class="res-rating">⭐ 4.0</span></div>
+                                            <div class="res-desc">上野公園內，熊貓造型咖哩飯與蛋包飯，100席寬敞嬰兒車OK。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E3%81%86%E3%81%95%E3%81%8E%E3%82%84%E3%82%AB%E3%83%95%E3%82%A7%20%E4%B8%8A%E9%87%8E" target="_blank" class="res-name"><span class="cafe-rank">2</span>うさぎやCAFÉ</a>
+                                            <div class="res-meta">🚶 步行約 6 分 | <span class="res-rating">⭐ 4.3</span></div>
+                                            <div class="res-desc">大正年間銅鑼燒老鋪經營，現做銅鑼燒鬆餅，職人紅豆餡。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=EVERYONEs%20CAFE%20%E4%B8%8A%E9%87%8E%E5%85%AC%E5%9C%92" target="_blank" class="res-name"><span class="cafe-rank">3</span>EVERYONEs CAFE</a>
+                                            <div class="res-meta">🚶 步行約 4 分 | <span class="res-rating">⭐ 4.1</span></div>
+                                            <div class="res-desc">熊貓鬆餅拼盤，166席含露台，おむつ替え台與兒童椅完備。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E3%82%B9%E3%82%BF%E3%83%BC%E3%83%90%E3%83%83%E3%82%AF%E3%82%B9%20%E4%B8%8A%E9%87%8E%E6%81%A9%E8%B3%9C%E5%85%AC%E5%9C%92" target="_blank" class="res-name"><span class="cafe-rank">4</span>星巴克 上野恩賜公園</a>
+                                            <div class="res-meta">🚶 步行約 5 分 | <span class="res-rating">⭐ 4.0</span></div>
+                                            <div class="res-desc">綠意環繞公園店，木質明亮空間，散步歇腳首選。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E4%B8%8A%E5%B3%B6%E7%8F%88%E7%90%B2%E5%BA%97%20%E9%BB%92%E7%94%B0%E8%A8%98%E5%BF%B5%E9%A4%A8" target="_blank" class="res-name"><span class="cafe-rank">5</span>上島珈琲 黑田記念館</a>
+                                            <div class="res-meta">🚶 步行約 8 分 | <span class="res-rating">⭐ 4.2</span></div>
+                                            <div class="res-desc">美術館別館內，露台可賞四季，黑糖拿鐵招牌靜謐。</div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                         <div class="meal-badges">
                             <div class="dropdown transport-trigger" onclick="togglePopup(event, this)">
                                 <div class="dropbtn transport-btn">🚃 交通攻略：機場 ➔ 上野</div>
@@ -809,103 +903,171 @@
                 </div>
             </div>
 
-            <!-- Day 2：上野東側廊帶 — 晴空塔→淺草→秋葉原，全程無迂迴 -->
+            <!-- Day 2：銀座文具 + BicCamera哩程 → 回飯店放物 → 上野午餐 → 品川水族館 -->
             <div class="day-card">
-                <h3 class="day-title">Day 2 (7/17)：東側廊帶制霸 — 雲端早餐 × 扭蛋 × 玩具天堂 🗼🏮🛒</h3>
+                <h3 class="day-title">Day 2 (7/17)：銀座 LOFT × 品川水族館 海豚秀 🖍️🐬</h3>
                 <div class="time-slot" id="d2-1">
                     <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox" id="cb-d2-1" onchange="toggleRow(this)"></div>
-                    <div class="time" onclick="clickTime(this)">08:00 - 09:30</div>
+                    <div class="time" onclick="clickTime(this)">08:30 - 09:30</div>
                     <div class="activity">
-                        出發前往 <a href="https://www.google.com/maps/search/?api=1&query=東京スカイツリー" target="_blank" class="map-spot">東京晴空塔</a> 🗼<br>
-                        <span class="meal-highlight" style="margin-top: 5px;">🥞 觀景台早餐</span>：直上 <span class="spot-highlight">天望甲板</span>，在 340M 高的 SKYTREE CAFE 享用雲端早餐俯瞰東京！
-                        <div class="meal-badges">
-                            <div class="dropdown transport-trigger" onclick="togglePopup(event, this)">
-                                <div class="dropbtn transport-btn">🚃 交通攻略：上野 ➔ 晴空塔</div>
-                                <div class="dropdown-content">
-                                    <div class="popup-header transport-header">🚇 雙效交通指南 (約 15 分鐘)</div>
-                                    <ul class="popup-list">
-                                        <li class="transit-pub"><div class="res-name">🚃 地鐵：需轉乘一次</div><div class="res-desc"><b>路線 1：</b> 上野站找橘色【銀座線】，往「淺草」方向，搭 3 站至「淺草站」下車。<br><b>路線 2：</b> 淺草站依黃色指標走到【都營淺草線】，往「印旛日本醫大/青砥」方向，搭 1 站至「押上站」下車。<br><b>出口：</b> 找【B3 出口】直結商場，不怕日曬。</div></li>
-                                        <li class="transit-taxi"><div class="res-name">🚕 計程車 (大推)</div><div class="res-desc">車程約 12 分鐘，車資約 NT$350-450。帶小孩強烈建議搭車直達 1 樓！</div></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="meal-badges" style="margin-top:0.4rem;"><div class="auto-meal" data-loc="skytree" data-meal="breakfast" style="display:contents"></div></div>
+                        <span class="meal-highlight">🥞 早餐時間</span><div class="meal-badges auto-meal" data-loc="ueno" data-meal="breakfast"></div>
                     </div>
                 </div>
                 <div class="time-slot" id="d2-2">
                     <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox" id="cb-d2-2" onchange="toggleRow(this)"></div>
-                    <div class="time" onclick="clickTime(this)">09:30 - 11:30</div>
-                    <div class="activity">吃完早餐，到同商場內的 <a href="https://www.google.com/maps/search/?api=1&query=すみだ水族館" target="_blank" class="map-spot">墨田水族館</a> 🐳 看企鵝與花園鰻放電！接著到晴空塔 3 樓 <a href="https://www.google.com/maps/search/?api=1&query=トミカショップ+東京スカイツリータウン" target="_blank" class="map-spot">Tomica Shop & Plarail Shop</a> 🚗 掃貨晴空塔限定車款。<br>
-                        <span style="font-size:0.85rem; color:#E53E3E; font-weight:600;">⚠️ 注意：ソラマチ店是純商品店，無法組裝小車車。</span><br>
-                        <span style="font-size:0.85rem; color:#718096;">💡 想要「自選零件組裝專屬 Tomica」的體驗（800日圓/台），需去<strong>東京駅一番街的 Tomica 東京店</strong>，建議安排在 Day 5 退房後、搭 Skyliner 前順路體驗，約需 30–45 分鐘。</span>
+                    <div class="time" onclick="clickTime(this)">10:30 - 12:00</div>
+                    <div class="activity">前往 <a href="https://www.google.com/maps/search/?api=1&query=銀座ロフト+銀座ベルビア館" target="_blank" class="map-spot">銀座ロフト Ginza LOFT</a> 🖍️（銀座ベルビア館 1–6F）：LOFT 全國旗艦店，1,387 坪、約 7 萬種商品！<strong>5 樓「ワーク&スタディ」文具樓層</strong>收羅世界文具，樓層寬敞好推嬰兒車，免稅對應。1 樓還有全國地方零食與話題商品，孩子也逛得開心。11:00 開店，10:30 出發先在銀座街頭散步剛剛好。<br>
+                        <span style="font-size:0.85rem; color:#718096;">💡 比起空間狹窄、暑假人擠人的伊東屋，LOFT 樓面寬敞、品項更多，帶孩子逛起來舒服太多。若文具迷仍想朝聖伊東屋，兩店步行僅 5 分鐘，可快閃 B1。</span>
+                        <div class="meal-badges" style="margin-top:0.4rem;">
+                            <div class="dropdown cafe-trigger restaurant-trigger" onclick="togglePopup(event, this)">
+                                <div class="dropbtn cafe-btn">☕ 附近咖啡廳 Top 5（銀座）</div>
+                                <div class="dropdown-content">
+                                    <div class="popup-header cafe-header">☕ 銀座 高評價咖啡廳 Top 5</div>
+                                    <ul class="popup-list">
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%82%A6%E3%82%A8%E3%82%B9%E3%83%88%20%E6%9C%AC%E5%BA%97" target="_blank" class="res-name"><span class="cafe-rank">1</span>銀座ウエスト 本店</a>
+                                            <div class="res-meta">🚶 步行約 5 分 | <span class="res-rating">⭐ 4.3</span></div>
+                                            <div class="res-desc">昭和老牌洋菓子喫茶，現烤葉子派與紅茶，優雅安靜。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E9%8A%80%E5%BA%A7%E6%9C%AC%E5%BA%97%20%E3%82%B5%E3%83%AD%E3%83%B3" target="_blank" class="res-name"><span class="cafe-rank">2</span>資生堂パーラー 銀座</a>
+                                            <div class="res-meta">🚶 步行約 6 分 | <span class="res-rating">⭐ 4.2</span></div>
+                                            <div class="res-desc">百年老鋪，名物草莓聖代與蘇打，孩子的夢幻甜點。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E3%82%AB%E3%83%95%E3%82%A7%E3%83%BC%E3%83%91%E3%82%A6%E3%83%AA%E3%82%B9%E3%82%BF%20%E9%8A%80%E5%BA%A7" target="_blank" class="res-name"><span class="cafe-rank">3</span>CAFÉ PAULISTA</a>
+                                            <div class="res-meta">🚶 步行約 7 分 | <span class="res-rating">⭐ 4.2</span></div>
+                                            <div class="res-desc">1911年創業日本最古老咖啡館之一，深焙咖啡迷朝聖。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E3%82%B9%E3%82%BF%E3%83%BC%E3%83%90%E3%83%83%E3%82%AF%E3%82%B9%20%E9%8A%80%E5%BA%A7%E3%83%9E%E3%83%AD%E3%83%8B%E3%82%A8%E9%80%9A%E3%82%8A" target="_blank" class="res-name"><span class="cafe-rank">4</span>星巴克 銀座マロニエ通り</a>
+                                            <div class="res-meta">🚶 步行約 3 分 | <span class="res-rating">⭐ 3.9</span></div>
+                                            <div class="res-desc">LOFT 附近，逛街中途歇腳，寬敞有兒童飲品。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=HIGASHIYA%20GINZA%20%E6%9D%B1%E5%B1%8B" target="_blank" class="res-name"><span class="cafe-rank">5</span>HIGASHIYA GINZA</a>
+                                            <div class="res-meta">🚶 步行約 5 分 | <span class="res-rating">⭐ 4.3</span></div>
+                                            <div class="res-desc">和菓子茶房，季節生菓子配日本茶，靜謐成人空間。</div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="meal-badges">
+                            <div class="dropdown transport-trigger" onclick="togglePopup(event, this)">
+                                <div class="dropbtn transport-btn">🚃 交通攻略：上野 ➔ 銀座</div>
+                                <div class="dropdown-content">
+                                    <div class="popup-header transport-header">🚇 雙效交通指南 (約 12 分鐘)</div>
+                                    <ul class="popup-list">
+                                        <li class="transit-pub"><div class="res-name">🚃 地鐵：直達免轉車</div><div class="res-desc"><b>路線：</b> 上野站搭橘色【銀座線】，往「涉谷」方向。<br><b>下車與出口：</b> 搭 5 站至「銀座一丁目」方向，於「銀座站」下車後從地下道步行至銀座一丁目【5番出口】，出站即是銀座ベルビア館（LOFT）。或搭【有楽町線】直達「銀座一丁目站」5番出口正上方。<br>💡 銀座一丁目站 5 番出口出來就是 LOFT 大門，零曝曬。</div></li>
+                                        <li class="transit-taxi"><div class="res-name">🚕 計程車</div><div class="res-desc">車資約 NT$450-600。直達銀座門口，省去換車時間。</div></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="time-slot" id="d2-3">
                     <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox" id="cb-d2-3" onchange="toggleRow(this)"></div>
-                    <div class="time" onclick="clickTime(this)">12:00 - 13:00</div>
+                    <div class="time" onclick="clickTime(this)">12:00 - 13:30</div>
                     <div class="activity">
-                        <span class="meal-highlight">🍴 午餐時間 (嚴守12:00)</span>：於晴空塔商場 (Solamachi) 內享用午餐！<div class="meal-badges auto-meal" data-loc="skytree" data-meal="lunch"></div>
+                        <span class="meal-highlight">🍴 午餐時間 (嚴守12:00)</span>：兩個方案，視當下時間彈性決定 👇<br>
+                        <span style="font-size:0.88rem;"><strong>A. 有楽町／銀座就近吃</strong>（怕來不及趕回上野時的安心選項，吃完直接搭 JR 去品川）<br>
+                        <strong>B. 回上野吃</strong>（時間充裕就回飯店放行李、輕裝出發去品川）</span>
+                        <div class="meal-badges" style="margin-top:0.3rem;">
+                            <div class="dropdown restaurant-trigger" onclick="togglePopup(event, this)">
+                                <div class="dropbtn">🍽️ A. 有楽町／銀座午餐選擇</div>
+                                <div class="dropdown-content">
+                                    <div class="popup-header">🍴 有楽町／銀座 親子午餐（就近吃）</div>
+                                    <ul class="popup-list">
+                                        <li><a href="https://www.google.com/maps/search/?api=1&query=有楽町マルイ+レストラン" target="_blank" class="res-name">有楽町マルイ 8F 餐廳樓層</a><div class="res-meta">🚶 有楽町站步行 3 分 | 💰 多樣價位</div><div class="res-desc">和洋定食、洋食、麵類選擇多，多家有兒童餐與嬰兒車空間，有楽町站前，午餐時段選擇多。</div></li>
+                                        <li><a href="https://www.google.com/maps/search/?api=1&query=ルミネ有楽町+レストラン" target="_blank" class="res-name">LUMINE 有楽町 レストラン街</a><div class="res-meta">🚶 步行 2 分 | 💰 NT$350-800</div><div class="res-desc">車站直結，午餐時段選擇豐富，快速好解決，孩子友善店家多。</div></li>
+                                        <li><a href="https://www.google.com/maps/search/?api=1&query=東京交通会館+レストラン+有楽町" target="_blank" class="res-name">東京交通会館（有楽町）</a><div class="res-meta">🚶 步行 3 分 | 💰 NT$300-900</div><div class="res-desc">各地方物產館與食堂，樓上有旋轉餐廳，孩子看窗外車流也開心。</div></li>
+                                        <li><a href="https://www.google.com/maps/search/?api=1&query=GINZA+SIX+レストラン" target="_blank" class="res-name">GINZA SIX 餐廳樓層</a><div class="res-meta">🚶 步行 8 分 | 💰 較高</div><div class="res-desc">若想吃好一點，銀座六本木旗艦商場，13F 餐廳景觀好，家庭友善。</div></li>
+                                        <li><a href="https://www.google.com/maps/search/?api=1&query=無印良品+銀座+レストラン+MUJI+Diner" target="_blank" class="res-name">MUJI Diner 銀座</a><div class="res-meta">🚶 步行 6 分 | 💰 NT$400-700</div><div class="res-desc">無印良品食堂，食材清爽健康，兒童餐與嬰兒車友善，大人孩子都合適。</div></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="meal-badges auto-meal" data-loc="ueno" data-meal="lunch" style="display:inline-block"></div>
+                        </div>
+                        <div class="meal-badges" style="margin-top:0.2rem;">
+                            <div class="dropdown transport-trigger" onclick="togglePopup(event, this)">
+                                <div class="dropbtn transport-btn">🚃 交通：兩方案怎麼去品川</div>
+                                <div class="dropdown-content">
+                                    <div class="popup-header transport-header">🚇 A/B 兩方案交通指南</div>
+                                    <ul class="popup-list">
+                                        <li class="transit-pub"><div class="res-name">🅰️ 有楽町就近吃 ➔ 直接去品川</div><div class="res-desc">有楽町站搭【JR 京濱東北線】往「大船」方向，直達「品川駅」約 10 分。<strong>省下回上野的來回，最省時間。</strong>如有大件行李可先寄品川駅寄物櫃。</div></li>
+                                        <li class="transit-pub"><div class="res-name">🅱️ 回上野放行李 ➔ 再去品川</div><div class="res-desc">銀座/有楽町→上野（JR 山手線約 12 分）放行李午餐，再上野→品川（京濱東北線約 20 分）。適合行李多、不想扛著跑的情況。</div></li>
+                                        <li class="transit-taxi"><div class="res-name">🚕 計程車</div><div class="res-desc">有楽町→品川車資約 NT$500-700；上野→品川約 NT$700-900。</div></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="time-slot" id="d2-4">
                     <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox" id="cb-d2-4" onchange="toggleRow(this)"></div>
-                    <div class="time" onclick="clickTime(this)">13:30 - 14:30</div>
-                    <div class="activity">步行 15 分鐘（或搭 1 站都營淺草線）至 <a href="https://www.google.com/maps/search/?api=1&query=雷門" target="_blank" class="map-spot">淺草雷門 & 仲見世通</a> 🏮：參拜淺草寺、看人力車穿梭、仲見世通掃街道具小物。
-                        <div class="meal-badges">
-                            <div class="dropdown transport-trigger" onclick="togglePopup(event, this)">
-                                <div class="dropbtn transport-btn">🚶 晴空塔 ➔ 淺草（步行 or 1站）</div>
+                    <div class="time" onclick="clickTime(this)">14:00 - 17:00</div>
+                    <div class="activity">
+                        🐬 <strong>マクセル アクアパーク品川</strong>：從上野搭車前往 <a href="https://www.google.com/maps/search/?api=1&query=マクセルアクアパーク品川" target="_blank" class="map-spot">Maxell Aqua Park 品川</a>（品川駅高輪口步行 2 分）。4 歲以上幼兒票 800 日圓、大人 2,500 日圓。<br>
+                        <strong>🎪 海豚表演 (Dolphin Show)</strong> 是最大亮點——燈光、音樂、水花全開，海豚躍出水面的瞬間讓孩子看到出神，保證成為整趟旅行最難忘的記憶之一。水母發光隧道、企鵝、魟魚觸摸池也都是孩子的最愛。全館室內冷氣，7 月午後避暑首選。<br>
+                        <div class="meal-badges" style="margin-top:0.4rem;">
+                            <div class="dropdown restaurant-trigger" onclick="togglePopup(event, this)">
+                                <div class="dropbtn" style="background:#FFF5F5;color:#C53030;border-color:#FEB2B2;">🐬 海豚表演場次時間表（點我）</div>
                                 <div class="dropdown-content">
-                                    <div class="popup-header transport-header">🗺️ 超短移動指南 (5-15 分鐘)</div>
+                                    <div class="popup-header" style="background:#C53030;">🎪 ドルフィンパフォーマンス 場次（2026 夏季）</div>
                                     <ul class="popup-list">
-                                        <li class="transit-pub"><div class="res-name">🚶 步行：沿隅田川最美</div><div class="res-desc">從押上商場出口往南步行約 15 分鐘，沿隅田川河岸走，邊走邊看晴空塔全景，一路到吾妻橋旁即是淺草，是今日最美的移動方式。</div></li>
-                                        <li class="transit-pub"><div class="res-name">🚃 地鐵：都營淺草線 1 站</div><div class="res-desc">押上站搭【都營淺草線】往「西馬込」方向，1 站至「淺草站」，A4 出口出站即雷門正面。帶行李或孩子太累時使用。</div></li>
+                                        <li><div class="res-name" style="color:#C53030;">☀️ 白天版 デイ ver.（每場約 15 分）</div><div class="res-desc" style="font-size:0.95rem;line-height:1.9;"><strong>① 11:30</strong> — 11:45<br><strong>② 13:00</strong> — 13:15<br><strong>③ 14:30</strong> — 14:45<br><strong>④ 16:00</strong> — 16:15</div></li>
+                                        <li style="background:#FFFAF0;"><div class="res-name" style="color:#DD6B20;">🎇 夜間版 ナイト ver.（夏季限定）</div><div class="res-desc">夏季 19 時台起加開夜場，結合 NAKED 數位煙火與燈光，昼夜氛圍完全不同。你們行程在白天，看 <strong>③ 14:30</strong> 場最順（14:00 入場剛好卡位）。</div></li>
+                                        <li style="background:#F0FFF4;"><div class="res-name" style="color:#276749;">💡 看秀小訣竅</div><div class="res-desc">全席自由座、先到先得，立ち見也 OK。想坐好位置提前 15-20 分入場占位；前排會被水花濺到，帶孩子建議坐中後段。營業至 20:00。</div></li>
+                                        <li style="background:#FFF5F5;"><div class="res-name" style="color:#C53030;">⚠️ 出發前務必再確認</div><div class="res-desc">場次偶有臨時調整（特別活動日），出發前一天上官網 event schedule 頁再核對一次當日時間最保險。</div></li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="time-slot" id="d2-4b">
-                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox" id="cb-d2-4b" onchange="toggleRow(this)"></div>
-                    <div class="time" onclick="clickTime(this)">14:30 - 15:30</div>
-                    <div class="activity">
-                        步行 1 分鐘直達 <a href="https://www.google.com/maps/search/?api=1&query=gashacoco+浅草" target="_blank" class="map-spot">gashacoco 淺草</a> 🎰（K-雷門2F）：專業扭蛋店，<strong>678 台</strong>扭蛋機排排站，每週上新商品，車車主題款找這裡！孩子可以自己按下、自己扭，拿到的瞬間是今天最開心的表情。<br>
-                        接著走路 3 分鐘直達 <a href="https://www.google.com/maps/search/?api=1&query=浅草花やしき" target="_blank" class="map-spot">淺草花屋敷 (Hanayashiki)</a> 🎡：日本現存最古老遊樂園（1853年！），兒童版小計程車🚕、小火車🚂，孩子如魚得水。<br>
-                        <span style="font-size:0.85rem; color:#718096;">💡 gashacoco → 花屋敷步行 3 分鐘，兩個都在雷門旁，完全零迂迴。</span>
+                        <div class="meal-badges" style="margin-top:0.4rem;">
+                            <div class="dropdown transport-trigger" onclick="togglePopup(event, this)">
+                                <div class="dropbtn transport-btn">🚃 上野 ➔ 品川水族館</div>
+                                <div class="dropdown-content">
+                                    <div class="popup-header transport-header">🚇 雙效交通指南 (約 20 分鐘)</div>
+                                    <ul class="popup-list">
+                                        <li class="transit-pub"><div class="res-name">🚃 JR：直達免轉車</div><div class="res-desc"><b>路線：</b> 上野站搭【JR 京濱東北線】往「大船」方向（或山手線），直達「品川駅」。<br><b>下車與出口：</b>【高輪口】出站，步行約 2 分到品川プリンスホテル內的アクアパーク。</div></li>
+                                        <li class="transit-taxi"><div class="res-name">🚕 計程車</div><div class="res-desc">車資約 NT$700-900。午餐後帶孩子直達，省去進出大車站月台。</div></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="time-slot" id="d2-5">
                     <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox" id="cb-d2-5" onchange="toggleRow(this)"></div>
-                    <div class="time" onclick="clickTime(this)">15:30 - 17:30</div>
-                    <div class="activity">前往 <a href="https://www.google.com/maps/search/?api=1&query=ビックカメラ 秋葉原" target="_blank" class="map-spot">BicCamera 秋葉原店</a> 🛒：7 樓超巨大玩具區，Tomica 車道組、Plarail 火車組軌道任挑選，7 月暑假限定款也在這裡！
-                        <div class="meal-badges">
-                            <div class="dropdown transport-trigger" onclick="togglePopup(event, this)">
-                                <div class="dropbtn transport-btn">🚃 淺草 ➔ 秋葉原（2 站直達）</div>
+                    <div class="time" onclick="clickTime(this)">17:30 - 19:00</div>
+                    <div class="activity">
+                        <span class="meal-highlight">🍽️ 晚餐時間</span>：兩個方案現場決定 👇<br>
+                        <span style="font-size:0.88rem;"><strong>A. 品川站周邊吃</strong>（水族館玩到閉館前肚子餓，就近解決）→ 品川駅內 atre / エキュート 餐廳林立<br>
+                        <strong>B. 回上野吃</strong>（想早點回飯店休息，搭車回上野周邊用餐）</span>
+                        <div class="meal-badges" style="margin-top:0.3rem;">
+                            <div class="dropdown restaurant-trigger" onclick="togglePopup(event, this)">
+                                <div class="dropbtn">🍽️ A. 品川站晚餐選擇</div>
                                 <div class="dropdown-content">
-                                    <div class="popup-header transport-header">🚇 超短移動指南 (約 5 分鐘)</div>
+                                    <div class="popup-header">🍴 品川駅周邊 親子晚餐</div>
                                     <ul class="popup-list">
-                                        <li class="transit-pub"><div class="res-name">🚃 JR：直達 2 站</div><div class="res-desc"><b>路線：</b> 淺草站步行 5 分到【淺草橋站】，搭 JR 総武線往「千葉」方向，1 站至「秋葉原站」。<br><b>出口：</b>【電氣街口】直走 1 分鐘到 BicCamera。<br>💡 也可從淺草搭都營淺草線至「東日本橋」再換乗，但 JR 最快。</div></li>
-                                        <li class="transit-taxi"><div class="res-name">🚕 計程車</div><div class="res-desc">車資約 NT$200-300。距離極短，帶疲憊孩子直達最輕鬆。</div></li>
+                                        <li><a href="https://www.google.com/maps/search/?api=1&query=atre品川+レストラン" target="_blank" class="res-name">atre 品川（站直結）</a><div class="res-meta">🚶 步行 2 分 | 💰 多樣價位</div><div class="res-desc">品川駅直結商場，和洋中選擇多，多家有兒童餐與嬰兒車空間，水族館出來最順路。</div></li>
+                                        <li><a href="https://www.google.com/maps/search/?api=1&query=エキュート品川" target="_blank" class="res-name">ecute 品川</a><div class="res-meta">🚶 站內 | 💰 NT$300-800</div><div class="res-desc">改札內美食街，便當、定食、甜點齊全，趕時間也能快速解決。</div></li>
+                                        <li><a href="https://www.google.com/maps/search/?api=1&query=品川プリンスホテル+レストラン" target="_blank" class="res-name">品川王子飯店餐廳群</a><div class="res-meta">🚶 步行 1 分 | 💰 較高</div><div class="res-desc">就在水族館同棟，多家家庭餐廳，玩完直接晚餐不用移動。</div></li>
                                     </ul>
                                 </div>
                             </div>
+                            <div class="meal-badges auto-meal" data-loc="ueno" data-meal="dinner" style="display:inline-block"></div>
                         </div>
-                    </div>
-                </div>
-                <div class="time-slot" id="d2-6">
-                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox" id="cb-d2-6" onchange="toggleRow(this)"></div>
-                    <div class="time" onclick="clickTime(this)">18:00 - 19:30</div>
-                    <div class="activity">
-                        <span class="meal-highlight">🍽️ 晚餐時間</span>：在秋葉原 UDX 美食街或周邊吃晚餐。<div class="meal-badges auto-meal" data-loc="akiba" data-meal="dinner"></div>
                         <div class="meal-badges" style="margin-top: 0.2rem;">
                             <div class="dropdown transport-trigger" onclick="togglePopup(event, this)">
-                                <div class="dropbtn transport-btn">🚃 歸途：秋葉原 ➔ 上野（2 站）</div>
+                                <div class="dropbtn transport-btn">🚃 歸途：品川 ➔ 上野</div>
                                 <div class="dropdown-content">
-                                    <div class="popup-header transport-header">🚇 輕鬆返回指南 (約 4 分鐘)</div>
+                                    <div class="popup-header transport-header">🚇 輕鬆返回指南 (約 20 分鐘)</div>
                                     <ul class="popup-list">
-                                        <li class="transit-pub"><div class="res-name">🚃 JR：直達 2 站</div><div class="res-desc"><b>路線：</b> 秋葉原站搭 JR【山手線】或【京濱東北線】，往「上野/大宮」方向，2 站直達上野。<br><b>出口：</b> 找【廣小路口】或【入谷口】步行回飯店。</div></li>
-                                        <li class="transit-taxi"><div class="res-name">🚕 計程車</div><div class="res-desc">車資約 NT$200。孩子玩到精疲力盡時，打車回飯店最溫柔。</div></li>
+                                        <li class="transit-pub"><div class="res-name">🚃 JR：直達免轉車</div><div class="res-desc"><b>路線：</b> 品川站搭【JR 京濱東北線】或【山手線】往「上野・大宮」方向，直達「上野站」。<br><b>出口：</b>【廣小路口】走回飯店。</div></li>
+                                        <li class="transit-taxi"><div class="res-name">🚕 計程車</div><div class="res-desc">車資約 NT$800-1100。孩子玩累了叫車直接回飯店最舒服。</div></li>
                                     </ul>
                                 </div>
                             </div>
@@ -916,24 +1078,23 @@
                 
                 <div class="remark-block">
                     <div class="remark-title">💡 備案 & 突發狀況應對</div>
-                    <div class="remark-item"><span class="remark-tag">晴空塔爆滿</span>天望甲板入場人數有限制，暑假建議一開門（8:00）或事先線上購票。人滿時：跳過展望台，直接去商場 Solamachi 逛 + 墨田水族館，下午照常前往淺草。</div>
-                    <div class="remark-item"><span class="remark-tag">孩子不配合</span>直接縮短晴空塔行程，從早上搭計程車直衝淺草，把時間全給 gashacoco + 花屋敷，孩子玩好玩滿更重要。</div>
-                    <div class="remark-item"><span class="remark-tag">下雨天</span>晴空塔→墨田水族館→Solamachi→gashacoco（室內）→花屋敷（部分戶外需雨衣）→BicCamera（室內），全程幾乎可免雨傘。</div>
-                    <div class="remark-item"><span class="remark-tag">備用景點</span><a href="https://www.google.com/maps/search/?api=1&query=国立科学博物館+上野" target="_blank" class="map-spot">国立科学博物館</a>（上野，飯店步行 10 分），恐龍化石與蒸汽機車展示，車車控孩子超愛，下雨天絕佳備案。</div>
+                    <div class="remark-item"><span class="remark-tag">LOFT 太擠</span>暑假銀座人潮多，建議 11:00 開店即進，先直上 5F 文具樓層再往下逛。若想朝聖伊東屋本店（步行 5 分），只快閃 B1 與 1F 避開排電梯人潮。</div>
+                    <div class="remark-item"><span class="remark-tag">海豚秀時段</span>白天四場 11:30／13:00／14:30／16:00（詳見行程內「海豚表演場次時間表」）。建議看 14:30 場，14:00 入場卡位剛好。若午餐拖到，可直接從銀座搭 JR 到品川（免回上野），輕裝去水族館。</div>
+                    <div class="remark-item"><span class="remark-tag">孩子在水族館累了</span>アクアパーク全室內、動線平緩，嬰兒車可推。累了可在館內咖啡區休息，不必硬撐看完所有展區，海豚秀看到就值回票價。</div>
+                    <div class="remark-item"><span class="remark-tag">下雨天</span>今日完全不怕雨：銀座 LOFT（室內）→ BicCamera 有楽町（地下直結）→ JR 回上野午餐 → 品川水族館（全室內），全程幾乎免雨傘。</div>
                 </div>
 <div class="day-map-strip">
                     <span class="map-strip-label">📍 今日景點</span>
-                    <a href="https://www.google.com/maps/search/?api=1&query=東京スカイツリー" target="_blank" class="map-pin-btn">📍 🗼 晴空塔</a>
-                    <a href="https://www.google.com/maps/search/?api=1&query=gashacoco+浅草" target="_blank" class="map-pin-btn">📍 🎰 gashacoco淺草</a>
-                    <a href="https://www.google.com/maps/search/?api=1&query=浅草花やしき" target="_blank" class="map-pin-btn">📍 🎡 花屋敷</a>
-                    <a href="https://www.google.com/maps/search/?api=1&query=ビックカメラ+秋葉原" target="_blank" class="map-pin-btn">📍 🛒 BicCamera秋葉原</a>
-                    <a href="https://www.google.com/maps/dir/35.7141,139.7774/35.7101,139.8107/35.7118,139.7966/35.7023,139.7745/35.7141,139.7774" target="_blank" class="map-open-btn">🗺️ Google Maps 開啟路線</a>
+                    <a href="https://www.google.com/maps/search/?api=1&query=銀座ロフト+銀座ベルビア館" target="_blank" class="map-pin-btn">📍 🖍️ 銀座LOFT</a>
+                    <a href="https://www.google.com/maps/search/?api=1&query=&Here+Ueno+Tokyo" target="_blank" class="map-pin-btn">📍 🏨 上野飯店(放行李)</a>
+                    <a href="https://www.google.com/maps/search/?api=1&query=マクセルアクアパーク品川" target="_blank" class="map-pin-btn">📍 🐬 品川水族館</a>
+                    <a href="https://www.google.com/maps/dir/35.6717,139.7640/35.7141,139.7774/35.6285,139.7387/35.7141,139.7774" target="_blank" class="map-open-btn">🗺️ Google Maps 開啟路線</a>
                 </div>
             </div>
 
-            <!-- Day 3：東京站 Tomica 組裝 → 電車景觀午餐 → 芝公園 → 增上寺 → 鐵塔點燈 -->
+            <!-- Day 3：東京站 Tomica 組裝 → 電車景觀午餐 → 一番街購物 → 增上寺 → 鐵塔點燈 -->
             <div class="day-card">
-                <h3 class="day-title">Day 3 (7/18)：Tomica 組裝 × 電車午餐 × 東京鐵塔點燈 🚗🚅🗼</h3>
+                <h3 class="day-title">Day 3 (7/18)：Tomica 組裝 × 日本最高樓 × teamLab × 鐵塔點燈 🚗🌇✨🗼</h3>
                 <div class="time-slot" id="d3-1">
                     <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox" id="cb-d3-1" onchange="toggleRow(this)"></div>
                     <div class="time" onclick="clickTime(this)">08:30 - 09:30</div>
@@ -958,6 +1119,41 @@
                     <div class="activity">
                         <a href="https://www.google.com/maps/search/?api=1&query=トミカショップ東京店+東京キャラクターストリート" target="_blank" class="map-spot">Tomica Shop 東京店</a> 🚗（東京駅一番街 B1 東京キャラクターストリート）：<strong>開門即進</strong>，全國唯一常設「組み立て工場」。孩子親手選顏色與車款零件，工作人員在面前現場組裝成專屬 Tomica，800 日圓/台，整趟旅行最特別的帶走紀念。逛完隔壁 Plarail Shop 與整條角色街。<br>
                         <span style="font-size:0.85rem; color:#E53E3E; font-weight:600;">⚠️ 暑假期間混雜，可能發整理券——務必開門前到場排隊。</span>
+                        <div class="meal-badges" style="margin-top:0.4rem;">
+                            <div class="dropdown cafe-trigger restaurant-trigger" onclick="togglePopup(event, this)">
+                                <div class="dropbtn cafe-btn">☕ 附近咖啡廳 Top 5（東京站）</div>
+                                <div class="dropdown-content">
+                                    <div class="popup-header cafe-header">☕ 東京站 高評價咖啡廳 Top 5</div>
+                                    <ul class="popup-list">
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=Cafe%201869%20%E4%B8%B8%E3%81%AE%E5%86%85%E3%82%AA%E3%82%A2%E3%82%BE" target="_blank" class="res-name"><span class="cafe-rank">1</span>Café 1869 丸の内オアゾ</a>
+                                            <div class="res-meta">🚶 步行約 3 分 | <span class="res-rating">⭐ 4.2</span></div>
+                                            <div class="res-desc">丸善書店附設，窗邊正對月台看電車，車控孩子最愛。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E3%83%88%E3%83%A9%E3%83%A4%E3%83%88%E3%82%A6%E3%82%AD%E3%83%A7%E3%82%A6%20KITTE%20%E4%B8%B8%E3%81%AE%E5%86%85" target="_blank" class="res-name"><span class="cafe-rank">2</span>TORAYA TOKYO KITTE</a>
+                                            <div class="res-meta">🚶 步行約 2 分 | <span class="res-rating">⭐ 4.3</span></div>
+                                            <div class="res-desc">虎屋和菓子咖啡，紅豆湯與羊羹，KITTE 2F 氣質空間。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E7%8C%BF%E7%94%B0%E5%BD%A6%E7%8F%88%E7%90%B2%20%E6%9D%B1%E4%BA%AC%E9%A7%85%20%E3%82%B0%E3%83%A9%E3%83%B3%E3%82%B9%E3%82%BF" target="_blank" class="res-name"><span class="cafe-rank">3</span>猿田彥珈琲 グランスタ</a>
+                                            <div class="res-meta">🚶 步行約 1 分 | <span class="res-rating">⭐ 4.2</span></div>
+                                            <div class="res-desc">車站內精品咖啡，外帶內用皆可，趕車前最方便。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E3%82%B9%E3%82%BF%E3%83%BC%E3%83%90%E3%83%83%E3%82%AF%E3%82%B9%20%E4%B8%B8%E3%83%93%E3%83%AB" target="_blank" class="res-name"><span class="cafe-rank">4</span>星巴克 丸ビル</a>
+                                            <div class="res-meta">🚶 步行約 3 分 | <span class="res-rating">⭐ 3.9</span></div>
+                                            <div class="res-desc">丸大樓內寬敞店，午後人少好取位，孩子有可可。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E3%82%AB%E3%83%95%E3%82%A7%20%E3%83%89%20%E3%83%A9%20%E3%83%97%E3%83%AC%E3%82%B9%20%E4%B8%B8%E3%81%AE%E5%86%85" target="_blank" class="res-name"><span class="cafe-rank">5</span>CAFÉ de la PRESSE</a>
+                                            <div class="res-meta">🚶 步行約 4 分 | <span class="res-rating">⭐ 4.0</span></div>
+                                            <div class="res-desc">法式風咖啡，可頌與拿鐵，丸之內街景悠閒。</div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="time-slot" id="d3-3">
@@ -1027,19 +1223,65 @@
                         </div>
                     </div>
                 </div>
+                <div class="time-slot" id="d3-3b">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox" id="cb-d3-3b" onchange="toggleRow(this)"></div>
+                    <div class="time" onclick="clickTime(this)">13:15 - 14:30</div>
+                    <div class="activity">
+                        🌇 <strong>森JP Tower 34F「Sky Room Cafe & Bar」</strong>：搭日比谷線至「神谷町站」，進入麻布台之丘 <a href="https://www.google.com/maps/search/?api=1&query=Hills+House+Sky+Room+Cafe+Bar+森JPタワー" target="_blank" class="map-spot">森JP Tower（日本最高樓 325M）</a>。搭電梯直上 34F 在 Sky Room Cafe 點餐後，可走大階梯下到 33F Sky Lobby 展望區——<strong>東京鐵塔正面無遮蔽就在眼前</strong>，從上往下看鐵塔的視角全東京只有這裡有！喝杯咖啡配絕景，孩子看大鐵塔看到出神。<br>
+                        <span style="font-size:0.85rem; color:#718096;">💰 規則：6 歲以上每人 ¥500 入場費 + 一人一杯飲料低消（咖啡約 ¥600 起）≈ ¥1,100/人；4 歲孩子免入場費。不接受預約，現場排隊。</span><br>
+                        <span style="font-size:0.85rem; color:#E53E3E; font-weight:600;">⚠️ 週六下午可能大排長龍（隊伍排到電梯口＝等 1 小時以上）。若隊伍過長，直接跳過先進 teamLab，看完出來傍晚再回頭試（營業至 21:00，夜景版鐵塔更美）。</span>
+                    </div>
+                </div>
                 <div class="time-slot" id="d3-4">
                     <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox" id="cb-d3-4" onchange="toggleRow(this)"></div>
-                    <div class="time" onclick="clickTime(this)">13:15 - 15:30</div>
+                    <div class="time" onclick="clickTime(this)">14:30 - 16:30</div>
                     <div class="activity">
-                        搭車前往鐵塔區。先到 <a href="https://www.google.com/maps/search/?api=1&query=芝公園" target="_blank" class="map-spot">芝公園</a> 🌿 放電：廣大草坪＋兒童遊具，孩子在鐵塔腳下奔跑，大人仰望赤紅鐵塔拍全家照。接著步行 5 分鐘至 <a href="https://www.google.com/maps/search/?api=1&query=増上寺" target="_blank" class="map-spot">增上寺 (Zojoji)</a> ⛩️：德川家菩提寺，免費，拍「鐵塔 + 古寺」400 年歷史與現代同框的絕景。
+                        ✨ <strong>teamLab Borderless</strong>：就在同一個園區內，從森JP Tower 步行 3 分鐘即達 <a href="https://www.google.com/maps/search/?api=1&query=チームラボボーダレス+麻布台ヒルズ" target="_blank" class="map-spot">teamLab Borderless</a>（ガーデンプラザB B1），全程冷氣零曝曬！1 萬㎡ 沉浸式光影空間，作品會回應孩子的觸碰與奔跑，4 歲孩子會瘋掉的世界級體驗。平均滯在約 2 小時，剛好避開全日最熱時段。<br>
+                        <span style="font-size:0.85rem; color:#E53E3E; font-weight:600;">⚠️ 入場採日時指定預約制，7/18 是週六，門票極易完售——務必提前於官網預訂 14:30 入場時段（兒童 4-12 歲 ¥1,500、大人 ¥3,800 起，週末加價）。</span><br>
+                        <span style="font-size:0.85rem; color:#718096;">💡 出館後沿麻布台之丘中央廣場散步往鐵塔方向，步行約 10 分鐘即達增上寺——teamLab 就長在今天的路線上，零繞路。</span>
+                        <div class="meal-badges" style="margin-top:0.4rem;">
+                            <div class="dropdown cafe-trigger restaurant-trigger" onclick="togglePopup(event, this)">
+                                <div class="dropbtn cafe-btn">☕ 附近咖啡廳 Top 5（麻布台之丘 / 東京鐵塔）</div>
+                                <div class="dropdown-content">
+                                    <div class="popup-header cafe-header">☕ 麻布台之丘 / 東京鐵塔 高評價咖啡廳 Top 5</div>
+                                    <ul class="popup-list">
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=Hills%20House%20Sky%20Room%20Cafe%20Bar%20%E9%BA%BB%E5%B8%83%E5%8F%B0%E3%83%92%E3%83%AB%E3%82%BA" target="_blank" class="res-name"><span class="cafe-rank">1</span>Sky Room Cafe & Bar</a>
+                                            <div class="res-meta">🚶 步行約 0 分 | <span class="res-rating">⭐ 4.3</span></div>
+                                            <div class="res-desc">森JP Tower 34F，東京鐵塔正面絕景，行程已含。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E9%BA%BB%E5%B8%83%E5%8F%B0%E3%83%92%E3%83%AB%E3%82%BA%20%E3%82%AC%E3%83%BC%E3%83%87%E3%83%B3%E3%83%97%E3%83%A9%E3%82%B6%20%E3%82%AB%E3%83%95%E3%82%A7" target="_blank" class="res-name"><span class="cafe-rank">2</span>麻布台之丘 中央廣場咖啡</a>
+                                            <div class="res-meta">🚶 步行約 3 分 | <span class="res-rating">⭐ 4.1</span></div>
+                                            <div class="res-desc">麻布台之丘綠意中央廣場，多家咖啡選擇，戶外開闊。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=TOKYO%20TOWER%20CAFE%20%E6%9D%B1%E4%BA%AC%E3%82%BF%E3%83%AF%E3%83%BC" target="_blank" class="res-name"><span class="cafe-rank">3</span>TOKYO TOWER CAFE</a>
+                                            <div class="res-meta">🚶 步行約 8 分 | <span class="res-rating">⭐ 4.0</span></div>
+                                            <div class="res-desc">鐵塔 1F 主甲板咖啡，邊喝邊仰望鐵塔鋼骨，打卡點。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E8%B1%86%E6%BA%90%20%E9%BA%BB%E5%B8%83%E5%8D%81%E7%95%AA" target="_blank" class="res-name"><span class="cafe-rank">4</span>豆源カフェ 麻布十番</a>
+                                            <div class="res-meta">🚶 步行約 10 分 | <span class="res-rating">⭐ 4.1</span></div>
+                                            <div class="res-desc">老鋪豆果子，散步往十番方向順路，現炸豆菓子配茶。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E6%B5%AA%E8%8A%B1%E5%AE%B6%E7%B7%8F%E6%9C%AC%E5%BA%97%20%E9%BA%BB%E5%B8%83%E5%8D%81%E7%95%AA" target="_blank" class="res-name"><span class="cafe-rank">5</span>浪花家總本店</a>
+                                            <div class="res-meta">🚶 步行約 11 分 | <span class="res-rating">⭐ 4.4</span></div>
+                                            <div class="res-desc">元祖鯛魚燒名店，現烤酥脆，孩子邊走邊吃最開心。</div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                         <div class="meal-badges">
                             <div class="dropdown transport-trigger" onclick="togglePopup(event, this)">
-                                <div class="dropbtn transport-btn">🚃 東京站 ➔ 芝公園（神谷町）</div>
+                                <div class="dropbtn transport-btn">🚃 東京站 ➔ teamLab（神谷町直結）</div>
                                 <div class="dropdown-content">
-                                    <div class="popup-header transport-header">🚇 移動指南 (約 20 分鐘)</div>
+                                    <div class="popup-header transport-header">🚇 移動指南 (約 15 分鐘)</div>
                                     <ul class="popup-list">
-                                        <li class="transit-pub"><div class="res-name">🚃 地鐵：日比谷線 直達</div><div class="res-desc"><b>路線：</b> 東京駅地下から【東京地鐵日比谷線】，往「中目黑」方向。<br><b>下車與出口：</b> 5 站至「神谷町站」，【1番出口】出站，步行 7 分到鐵塔，芝公園就在途中。</div></li>
-                                        <li class="transit-taxi"><div class="res-name">🚕 計程車</div><div class="res-desc">車資約 NT$600-800。午餐後帶孩子直達最輕鬆。</div></li>
+                                        <li class="transit-pub"><div class="res-name">🚃 地鐵：日比谷線 直達</div><div class="res-desc"><b>路線：</b> 東京駅地下から【東京地鐵日比谷線】，往「中目黑」方向。<br><b>下車與出口：</b> 5 站至「神谷町站」，找【5番出口】——<strong>室內直結 teamLab Borderless 入口</strong>，下雨也完全不淋雨。</div></li>
+                                        <li class="transit-taxi"><div class="res-name">🚕 計程車</div><div class="res-desc">車資約 NT$600-800。直達麻布台ヒルズ ガーデンプラザB。</div></li>
                                     </ul>
                                 </div>
                             </div>
@@ -1048,9 +1290,9 @@
                 </div>
                 <div class="time-slot" id="d3-5">
                     <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox" id="cb-d3-5" onchange="toggleRow(this)"></div>
-                    <div class="time" onclick="clickTime(this)">15:30 - 18:30</div>
+                    <div class="time" onclick="clickTime(this)">16:30 - 18:30</div>
                     <div class="activity">
-                        回到 <a href="https://www.google.com/maps/search/?api=1&query=東京タワー" target="_blank" class="map-spot">東京鐵塔廣場</a>，在塔下悠閒等待黃昏。<br>
+                        從 teamLab 出館，沿麻布台之丘散步往鐵塔方向（此時暑氣漸退，步行約 10 分鐘）。先到 <a href="https://www.google.com/maps/search/?api=1&query=増上寺" target="_blank" class="map-spot">增上寺</a> ⛩️ 參觀（免費，大殿廊道有遮蔭），拍「鐵塔 + 古寺」同框絕景；再散步 5 分鐘到 <a href="https://www.google.com/maps/search/?api=1&query=東京タワー" target="_blank" class="map-spot">東京鐵塔廣場</a>，悠閒等待黃昏。<br>
                         <span class="tokyo-tower-highlight">🗼 【今日壓軸】黃昏 × 東京鐵塔點燈</span><br>
                         《東京愛情故事》完治與莉香的永恆地標。日落後整座赤紅鐵塔緩緩點亮橘光 ✨，孩子仰頭目瞪口呆，大人重溫劇中場景——這一刻值得今天全部的移動。
                     </div>
@@ -1079,6 +1321,8 @@
                 <div class="remark-block">
                     <div class="remark-title">💡 備案 & 突發狀況應對</div>
                     <div class="remark-item"><span class="remark-tag">整理券已滿</span>Tomica 整理券拿完時：先逛整條角色街（哆啦A夢、皮卡丘等店家）約 1 小時，再回來看是否有空位，或改買車款帶回家。</div>
+                    <div class="remark-item"><span class="remark-tag">Sky Room 排隊太長</span>週六下午隊伍若排到電梯口（等待 1 小時以上），先進 teamLab（14:30 場次時間固定），出館後 17:00 左右再回頭——夕陽到夜景時段的鐵塔視角反而更美，營業至 21:00 時間充裕。</div>
+                    <div class="remark-item"><span class="remark-tag">teamLab 沒搶到票</span>備案：下午留在<a href="https://www.google.com/maps/search/?api=1&query=東京駅一番街" target="_blank" class="map-spot">東京駅一番街</a>（冷氣全開），逛 <a href="https://www.google.com/maps/search/?api=1&query=東京おかしランド" target="_blank" class="map-spot">東京おかしランド</a> 零食直營店 + 伴手禮採購，15:30 再搭日比谷線前往神谷町接增上寺與鐵塔行程，動線不變。</div>
                     <div class="remark-item"><span class="remark-tag">孩子在東京站累了</span>KITTE 丸の内 屋上庭園（6F，免費）可俯瞰月台，孩子在戶外跑跑看電車，大人休息。下午行程可直接縮短。</div>
                     <div class="remark-item"><span class="remark-tag">鐵塔點燈取消</span>天候因素偶爾不點燈，可改去 <a href="https://www.google.com/maps/search/?api=1&query=六本木ヒルズ+東京シティビュー" target="_blank" class="map-spot">六本木Hills 東京 City View</a>（神谷町搭地鐵 2 站），夜景同樣壯觀。</div>
                     <div class="remark-item"><span class="remark-tag">下雨天</span>Tomica 東京站（室內）→ KITTE 午餐（室內）→ 增上寺（有大殿廊道可避雨）→ 鐵塔フットタウン 1F 室內廣場等待點燈，雨天完全可執行。</div>
@@ -1087,87 +1331,218 @@
                     <span class="map-strip-label">📍 今日景點</span>
                     <a href="https://www.google.com/maps/search/?api=1&query=トミカショップ+東京キャラクターストリート" target="_blank" class="map-pin-btn">📍 🚗 Tomica東京店</a>
                     <a href="https://www.google.com/maps/search/?api=1&query=Cafe+1869+丸の内オアゾ" target="_blank" class="map-pin-btn">📍 🚅 Café 1869丸の内</a>
-                    <a href="https://www.google.com/maps/search/?api=1&query=芝公園+港区" target="_blank" class="map-pin-btn">📍 🌿 芝公園</a>
+                    <a href="https://www.google.com/maps/search/?api=1&query=森JPタワー+麻布台ヒルズ" target="_blank" class="map-pin-btn">📍 🌇 森JP Tower 34F</a>
+                    <a href="https://www.google.com/maps/search/?api=1&query=チームラボボーダレス+麻布台ヒルズ" target="_blank" class="map-pin-btn">📍 ✨ teamLab麻布台</a>
                     <a href="https://www.google.com/maps/search/?api=1&query=増上寺" target="_blank" class="map-pin-btn">📍 ⛩️ 增上寺</a>
                     <a href="https://www.google.com/maps/search/?api=1&query=東京タワー" target="_blank" class="map-pin-btn">📍 🗼 東京鐵塔</a>
                     <a href="https://www.google.com/maps/dir/35.6812,139.7671/35.6812,139.7671/35.6585,139.7454/35.6562,139.7490/35.6585,139.7454" target="_blank" class="map-open-btn">🗺️ Google Maps 開啟路線</a>
                 </div>
             </div>
 
-            <!-- Day 4：銀座文具 + 麻布十番散策，動線順路無迂迴 -->
+            <!-- Day 4：上野東側廊帶 — 晴空塔→淺草→秋葉原，全程無迂迴 -->
             <div class="day-card">
-                <h3 class="day-title">Day 4 (7/19)：銀座文具朝聖 × 麻布十番下町散策 🖍️🏘️</h3>
+                <h3 class="day-title">Day 4 (7/19)：東側廊帶制霸 — 晴空塔 × 扭蛋 × 玩具哩程 🗼🏮✈️</h3>
                 <div class="time-slot" id="d4-1">
                     <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox" id="cb-d4-1" onchange="toggleRow(this)"></div>
-                    <div class="time" onclick="clickTime(this)">08:30 - 09:30</div>
+                    <div class="time" onclick="clickTime(this)">08:00 - 09:30</div>
                     <div class="activity">
-                        <span class="meal-highlight">🥞 早餐時間</span><div class="meal-badges auto-meal" data-loc="ueno" data-meal="breakfast"></div>
+                        出發前往 <a href="https://www.google.com/maps/search/?api=1&query=東京スカイツリー" target="_blank" class="map-spot">東京晴空塔</a> 🗼<br>
+                        <span class="meal-highlight" style="margin-top: 5px;">🥞 觀景台早餐</span>：直上 <span class="spot-highlight">天望甲板</span>，在 340M 高的 SKYTREE CAFE 享用雲端早餐俯瞰東京！
+                        <div class="meal-badges" style="margin-top:0.4rem;">
+                            <div class="dropdown cafe-trigger restaurant-trigger" onclick="togglePopup(event, this)">
+                                <div class="dropbtn cafe-btn">☕ 附近咖啡廳 Top 5（晴空塔 Solamachi）</div>
+                                <div class="dropdown-content">
+                                    <div class="popup-header cafe-header">☕ 晴空塔 Solamachi 高評價咖啡廳 Top 5</div>
+                                    <ul class="popup-list">
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=SKYTREE%20CAFE%20%E6%9D%B1%E4%BA%AC%E3%82%B9%E3%82%AB%E3%82%A4%E3%83%84%E3%83%AA%E3%83%BC%20350" target="_blank" class="res-name"><span class="cafe-rank">1</span>SKYTREE CAFE 350F</a>
+                                            <div class="res-meta">🚶 步行約 0 分 | <span class="res-rating">⭐ 4.2</span></div>
+                                            <div class="res-desc">天望甲板上的雲端咖啡，邊喝邊俯瞰東京全景，孩子貼著玻璃看風景。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=bills%20%E6%9D%B1%E4%BA%AC%E3%82%B9%E3%82%AB%E3%82%A4%E3%83%84%E3%83%AA%E3%83%BC%20Solamachi" target="_blank" class="res-name"><span class="cafe-rank">2</span>bills 東京スカイツリー</a>
+                                            <div class="res-meta">🚶 步行約 2 分 | <span class="res-rating">⭐ 4.1</span></div>
+                                            <div class="res-desc">澳洲名店，世界第一的瑞可塔鬆餅，孩子最愛，ベビーカーOK。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=Cafe%26Meal%20MUJI%20%E6%9D%B1%E4%BA%AC%E3%82%B9%E3%82%AB%E3%82%A4%E3%83%84%E3%83%AA%E3%83%BC%E3%82%BF%E3%82%A6%E3%83%B3" target="_blank" class="res-name"><span class="cafe-rank">3</span>Café & Meal MUJI 押上</a>
+                                            <div class="res-meta">🚶 步行約 3 分 | <span class="res-rating">⭐ 4.0</span></div>
+                                            <div class="res-desc">無印良品餐廳，食材清爽無添加，座位寬敞好推嬰兒車。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E7%8C%BF%E7%94%B0%E5%BD%A6%E7%8F%88%E7%90%B2%20%E6%9D%B1%E4%BA%AC%E3%82%B9%E3%82%AB%E3%82%A4%E3%83%84%E3%83%AA%E3%83%BC%E3%82%BF%E3%82%A6%E3%83%B3%20%E3%82%BD%E3%83%A9%E3%83%9E%E3%83%81" target="_blank" class="res-name"><span class="cafe-rank">4</span>猿田彥珈琲 Solamachi</a>
+                                            <div class="res-meta">🚶 步行約 2 分 | <span class="res-rating">⭐ 4.2</span></div>
+                                            <div class="res-desc">東京人氣精品咖啡，手沖單品香氣足，商場內好找。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E3%82%B9%E3%82%BF%E3%83%BC%E3%83%90%E3%83%83%E3%82%AF%E3%82%B9%20%E6%9D%B1%E4%BA%AC%E3%82%BD%E3%83%A9%E3%83%9E%E3%83%81" target="_blank" class="res-name"><span class="cafe-rank">5</span>星巴克 Solamachi</a>
+                                            <div class="res-meta">🚶 步行約 2 分 | <span class="res-rating">⭐ 3.9</span></div>
+                                            <div class="res-desc">商場內穩定選擇，有兒童可可，冷氣足適合避暑歇腳。</div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="meal-badges">
+                            <div class="dropdown transport-trigger" onclick="togglePopup(event, this)">
+                                <div class="dropbtn transport-btn">🚃 交通攻略：上野 ➔ 晴空塔</div>
+                                <div class="dropdown-content">
+                                    <div class="popup-header transport-header">🚇 雙效交通指南 (約 15 分鐘)</div>
+                                    <ul class="popup-list">
+                                        <li class="transit-pub"><div class="res-name">🚃 地鐵：需轉乘一次</div><div class="res-desc"><b>路線 1：</b> 上野站找橘色【銀座線】，往「淺草」方向，搭 3 站至「淺草站」下車。<br><b>路線 2：</b> 淺草站依黃色指標走到【都營淺草線】，往「印旛日本醫大/青砥」方向，搭 1 站至「押上站」下車。<br><b>出口：</b> 找【B3 出口】直結商場，不怕日曬。</div></li>
+                                        <li class="transit-taxi"><div class="res-name">🚕 計程車 (大推)</div><div class="res-desc">車程約 12 分鐘，車資約 NT$350-450。帶小孩強烈建議搭車直達 1 樓！</div></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="meal-badges" style="margin-top:0.4rem;"><div class="auto-meal" data-loc="skytree" data-meal="breakfast" style="display:contents"></div></div>
                     </div>
                 </div>
                 <div class="time-slot" id="d4-2">
                     <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox" id="cb-d4-2" onchange="toggleRow(this)"></div>
-                    <div class="time" onclick="clickTime(this)">10:00 - 12:00</div>
-                    <div class="activity">前往 <a href="https://www.google.com/maps/search/?api=1&query=伊東屋+銀座" target="_blank" class="map-spot">銀座 伊東屋 G.Itoya</a> 🖍️：全日本最厲害的 12 層樓絕美文具百貨，文具迷聖地，精選好物帶回台灣！
-                        <div class="meal-badges">
-                            <div class="dropdown transport-trigger" onclick="togglePopup(event, this)">
-                                <div class="dropbtn transport-btn">🚃 交通攻略：上野 ➔ 銀座</div>
-                                <div class="dropdown-content">
-                                    <div class="popup-header transport-header">🚇 雙效交通指南 (約 12 分鐘)</div>
-                                    <ul class="popup-list">
-                                        <li class="transit-pub"><div class="res-name">🚃 地鐵：直達免轉車</div><div class="res-desc"><b>路線：</b> 上野站搭橘色【銀座線】，往「涉谷」方向。<br><b>下車與出口：</b> 6 站直達「銀座站」，找【A13 出口】出站步行 2 分鐘到伊東屋。<br>💡 銀座線上野↔銀座直達，是全程最短路線。</div></li>
-                                        <li class="transit-taxi"><div class="res-name">🚕 計程車</div><div class="res-desc">車資約 NT$450-600。直達銀座門口，省去換車時間。</div></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="time" onclick="clickTime(this)">09:30 - 11:00</div>
+                    <div class="activity">吃完早餐，慢慢逛晴空塔商場 <a href="https://www.google.com/maps/search/?api=1&query=東京ソラマチ" target="_blank" class="map-spot">Solamachi</a> 🛍️：3 樓 <a href="https://www.google.com/maps/search/?api=1&query=トミカショップ+東京スカイツリータウン" target="_blank" class="map-spot">Tomica Shop & Plarail Shop</a> 🚗 掃貨晴空塔限定車款，還有 <a href="https://www.google.com/maps/search/?api=1&query=ウルトラマンワールド+スカイツリー" target="_blank" class="map-spot">超人力霸王 & 各式角色店</a>，孩子邊逛邊玩不無聊。<br>
+                        <span style="font-size:0.85rem; color:#E53E3E; font-weight:600;">⚠️ 注意：ソラマチ店是純商品店，無法組裝小車車（組裝體驗在 Day 3 東京站已完成）。</span>
                     </div>
                 </div>
                 <div class="time-slot" id="d4-3">
                     <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox" id="cb-d4-3" onchange="toggleRow(this)"></div>
-                    <div class="time" onclick="clickTime(this)">12:00 - 13:30</div>
+                    <div class="time" onclick="clickTime(this)">12:00 - 13:00</div>
                     <div class="activity">
-                        <span class="meal-highlight">🍴 午餐時間 (嚴守12:00)</span>：銀座精選午餐，行前最豐盛的一餐。<div class="meal-badges auto-meal" data-loc="ginza" data-meal="lunch"></div>
+                        <span class="meal-highlight">🍴 午餐時間 (嚴守12:00)</span>：於晴空塔商場 (Solamachi) 內享用午餐！<div class="meal-badges auto-meal" data-loc="skytree" data-meal="lunch"></div>
                     </div>
                 </div>
                 <div class="time-slot" id="d4-4">
                     <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox" id="cb-d4-4" onchange="toggleRow(this)"></div>
-                    <div class="time" onclick="clickTime(this)">14:00 - 16:30</div>
-                    <div class="activity">
-                        搭車前往 <a href="https://www.google.com/maps/search/?api=1&query=麻布十番商店街" target="_blank" class="map-spot">麻布十番商店街</a> 🏘️：充滿老江戶風情的下町商店街。退房前一天輕鬆散策，邊走邊吃邊買伴手禮，把行李空間留給這裡。<br><br>
-                        <strong>🛍️ 必買：</strong><br>
-                        ・<a href="https://www.google.com/maps/search/?api=1&query=たぬき煎餅+麻布十番" target="_blank" class="map-spot">たぬき煎餅（狸仙貝）</a>：手工燒製動物造型煎餅，小孩看到造型超開心，買盒裝帶回台灣最適合<br>
-                        ・<a href="https://www.google.com/maps/search/?api=1&query=豆源+麻布十番" target="_blank" class="map-spot">豆源</a>：明治元年（1868年）創業！揚げ落花生、揚げおかき等豆果子現撈裝袋，香氣直衝，最受歡迎的正統和式伴手禮<br>
-                        ・<a href="https://www.google.com/maps/search/?api=1&query=あげもちcocoro+麻布十番" target="_blank" class="map-spot">あげもちcocoro（揚げ餅）</a>：麻布十番名物現炸揚げ餅，鹽、蝦、玉米口味，邊走邊吃熱騰騰最爽<br><br>
-                        <strong>🍡 現場必吃：</strong><br>
-                        ・<a href="https://www.google.com/maps/search/?api=1&query=浪花家総本店+麻布十番" target="_blank" class="map-spot">浪花家總本店</a>：麻布十番元祖鯛魚燒，現烤整條 180 日圓，皮薄脆、紅豆滿，7 月下午排隊也值得<br>
-                        <span style="font-size:0.85rem; color:#718096;">💡 明日就要退房，今天刻意輕鬆安排，讓孩子保留體力，大人把伴手禮一次採購完畢。</span>
+                    <div class="time" onclick="clickTime(this)">13:00 - 14:00</div>
+                    <div class="activity">搭地鐵 1 站至 <a href="https://www.google.com/maps/search/?api=1&query=雷門" target="_blank" class="map-spot">淺草雷門 & 仲見世通</a> 🏮：參拜淺草寺、看人力車穿梭、仲見世通掃街道具小物。
+                        <div class="meal-badges" style="margin-top:0.4rem;">
+                            <div class="dropdown cafe-trigger restaurant-trigger" onclick="togglePopup(event, this)">
+                                <div class="dropbtn cafe-btn">☕ 附近咖啡廳 Top 5（淺草雷門）</div>
+                                <div class="dropdown-content">
+                                    <div class="popup-header cafe-header">☕ 淺草雷門 高評價咖啡廳 Top 5</div>
+                                    <ul class="popup-list">
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E7%8F%88%E7%90%B2%E5%A4%A9%E5%9B%BD%20%E6%B5%85%E8%8D%89" target="_blank" class="res-name"><span class="cafe-rank">1</span>淺草 珈琲天國</a>
+                                            <div class="res-meta">🚶 步行約 3 分 | <span class="res-rating">⭐ 4.1</span></div>
+                                            <div class="res-desc">昭和懷舊純喫茶，鬆餅烙印「天國」二字，孩子覺得新奇。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E3%83%9A%E3%83%AA%E3%82%AB%E3%83%B3%E3%82%AB%E3%83%95%E3%82%A7%20%E6%B5%85%E8%8D%89" target="_blank" class="res-name"><span class="cafe-rank">2</span>PELICAN CAFÉ</a>
+                                            <div class="res-meta">🚶 步行約 6 分 | <span class="res-rating">⭐ 4.3</span></div>
+                                            <div class="res-desc">老牌麵包店附設咖啡，炭烤厚片吐司是招牌，排隊名店。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=Suke6%20Diner%20%E6%B5%85%E8%8D%89" target="_blank" class="res-name"><span class="cafe-rank">3</span>Suke6 Diner</a>
+                                            <div class="res-meta">🚶 步行約 7 分 | <span class="res-rating">⭐ 4.2</span></div>
+                                            <div class="res-desc">時尚早午餐咖啡，挑高空間明亮，ベビーカー進入無障礙。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E3%82%B9%E3%82%BF%E3%83%BC%E3%83%90%E3%83%83%E3%82%AF%E3%82%B9%20%E6%B5%85%E8%8D%89%E9%9B%B7%E9%96%80%E5%89%8D" target="_blank" class="res-name"><span class="cafe-rank">4</span>星巴克 淺草雷門前</a>
+                                            <div class="res-meta">🚶 步行約 2 分 | <span class="res-rating">⭐ 3.9</span></div>
+                                            <div class="res-desc">雷門正前方，2 樓窗邊可看雷門人潮，孩子歇腳首選。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E3%82%A2%E3%83%B3%E3%83%82%E3%82%A7%E3%83%A9%E3%82%B9%20%E6%B5%85%E8%8D%89" target="_blank" class="res-name"><span class="cafe-rank">5</span>王樣articho 淺草</a>
+                                            <div class="res-meta">🚶 步行約 5 分 | <span class="res-rating">⭐ 4.0</span></div>
+                                            <div class="res-desc">創業70年老喫茶，名物「アンヂェラス」蛋糕，下町風情。</div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div><br><span style="font-size:0.85rem; color:#E53E3E; font-weight:600;">⚠️ 7 月酷暑，請勿步行前往（曝曬 15 分鐘），直接搭地鐵或計程車。</span>
                         <div class="meal-badges">
                             <div class="dropdown transport-trigger" onclick="togglePopup(event, this)">
-                                <div class="dropbtn transport-btn">🚃 銀座 ➔ 麻布十番</div>
+                                <div class="dropbtn transport-btn">🚶 晴空塔 ➔ 淺草（步行 or 1站）</div>
                                 <div class="dropdown-content">
-                                    <div class="popup-header transport-header">🚇 移動指南 (約 10 分鐘)</div>
+                                    <div class="popup-header transport-header">🗺️ 超短移動指南 (5-15 分鐘)</div>
                                     <ul class="popup-list">
-                                        <li class="transit-pub"><div class="res-name">🚃 地鐵：都營大江戸線 直達</div><div class="res-desc"><b>路線：</b> 銀座站步行至「東銀座站」，搭【都營大江戸線】往「光が丘」方向。<br><b>下車與出口：</b> 2 站至「麻布十番站」，找【7號出口】出站即商店街入口。</div></li>
-                                        <li class="transit-taxi"><div class="res-name">🚕 計程車</div><div class="res-desc">車資約 NT$350-500。文具戰利品多的話，搭車最輕鬆。</div></li>
+                                        <li class="transit-pub"><div class="res-name">🚃 地鐵：都營淺草線 1 站（首選）</div><div class="res-desc">押上站搭【都營淺草線】往「西馬込」方向，1 站至「淺草站」，A4 出口出站即雷門正面。7 月正午高溫，全程冷氣移動最舒適。</div></li>
+                                        <li class="transit-taxi"><div class="res-name">🚕 計程車</div><div class="res-desc">車程約 5 分鐘，車資約 NT$200-280。孩子在晴空塔玩累的話，直接搭車到雷門口最省力。</div></li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                <div class="time-slot" id="d4-4b">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox" id="cb-d4-4b" onchange="toggleRow(this)"></div>
+                    <div class="time" onclick="clickTime(this)">14:00 - 15:30</div>
+                    <div class="activity">
+                        步行 1 分鐘直達 <a href="https://www.google.com/maps/search/?api=1&query=gashacoco+浅草" target="_blank" class="map-spot">gashacoco 淺草</a> 🎰（K-雷門2F）：專業扭蛋店，<strong>678 台</strong>扭蛋機排排站，每週上新商品，車車主題款找這裡！孩子可以自己按下、自己扭，拿到的瞬間是今天最開心的表情。<br>
+                        接著走路 3 分鐘直達 <a href="https://www.google.com/maps/search/?api=1&query=浅草花やしき" target="_blank" class="map-spot">淺草花屋敷 (Hanayashiki)</a> 🎡：日本現存最古老遊樂園（1853年！），兒童版小計程車🚕、小火車🚂，孩子如魚得水。<br>
+                        <span style="font-size:0.85rem; color:#718096;">💡 gashacoco → 花屋敷步行 3 分鐘，兩個都在雷門旁，完全零迂迴。</span>
+                    </div>
+                </div>
                 <div class="time-slot" id="d4-5">
                     <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox" id="cb-d4-5" onchange="toggleRow(this)"></div>
-                    <div class="time" onclick="clickTime(this)">17:30 - 19:00</div>
+                    <div class="time" onclick="clickTime(this)">15:30 - 17:30</div>
+                    <div class="activity">前往 <a href="https://www.google.com/maps/search/?api=1&query=ビックカメラ 秋葉原" target="_blank" class="map-spot">BicCamera 秋葉原店</a> 🛒✈️：7 樓超巨大玩具區，Tomica 車道組、Plarail 火車組軌道任挑選，7 月暑假限定款也在這裡！家電、藥妝、伴手禮一次買齊。<br>
+                        <strong>✈️ 長榮哩程累積</strong>：完成免稅消費後，結帳時出示「無限萬哩遊」會員卡號即可累積里程（2026/5/18 起的新方案）。<br>
+                        <span style="font-size:0.85rem; color:#E53E3E; font-weight:600;">⚠️ 兩個必確認：①出發前向 EVA 確認「秋葉原店」在指定分店名單內（若不在，改用有楽町店等名單內分店）；②須先符合免稅資格（同日同店滿額 + 出示護照）才能疊加哩程。記得帶會員卡號！</span>
+                        <div class="meal-badges" style="margin-top:0.4rem;">
+                            <div class="dropdown cafe-trigger restaurant-trigger" onclick="togglePopup(event, this)">
+                                <div class="dropbtn cafe-btn">☕ 附近咖啡廳 Top 5（秋葉原 / 阿美橫）</div>
+                                <div class="dropdown-content">
+                                    <div class="popup-header cafe-header">☕ 秋葉原 / 阿美橫 高評價咖啡廳 Top 5</div>
+                                    <ul class="popup-list">
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E7%8F%88%E7%90%B2%E5%AE%B6%20%E7%A7%8B%E8%91%89%E5%8E%9F" target="_blank" class="res-name"><span class="cafe-rank">1</span>珈琲家 秋葉原</a>
+                                            <div class="res-meta">🚶 步行約 3 分 | <span class="res-rating">⭐ 4.1</span></div>
+                                            <div class="res-desc">昭和風自家烘焙咖啡，安靜不吵雜，避開電器街喧囂。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E3%82%B9%E3%82%BF%E3%83%BC%E3%83%90%E3%83%83%E3%82%AF%E3%82%B9%20%E3%82%A2%E3%83%88%E3%83%AC%E7%A7%8B%E8%91%89%E5%8E%9F" target="_blank" class="res-name"><span class="cafe-rank">2</span>星巴克 アトレ秋葉原</a>
+                                            <div class="res-meta">🚶 步行約 1 分 | <span class="res-rating">⭐ 3.9</span></div>
+                                            <div class="res-desc">車站直結，購物後最快歇腳點，有兒童飲品。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=CAFE%20ASAN%202k540%20%E5%BE%A1%E5%BE%92%E7%94%BA" target="_blank" class="res-name"><span class="cafe-rank">3</span>CAFE ASAN 御徒町</a>
+                                            <div class="res-meta">🚶 步行約 5 分 | <span class="res-rating">⭐ 4.2</span></div>
+                                            <div class="res-desc">高架橋下文創空間 2k540 內，寬敞挑高，孩子可跑動。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E4%B8%8A%E5%B3%B6%E7%8F%88%E7%90%B2%E5%BA%97%20%E4%B8%8A%E9%87%8E%E3%82%A2%E3%83%A1%E6%A8%AA" target="_blank" class="res-name"><span class="cafe-rank">4</span>上島珈琲店 阿美橫</a>
+                                            <div class="res-meta">🚶 步行約 4 分 | <span class="res-rating">⭐ 3.9</span></div>
+                                            <div class="res-desc">阿美橫町旁，黑糖拿鐵招牌，逛街中途補給站。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E3%81%BF%E3%81%AF%E3%81%97%20%E4%B8%8A%E9%87%8E%E6%9C%AC%E5%BA%97%20%E3%81%82%E3%82%93%E3%81%BF%E3%81%A4" target="_blank" class="res-name"><span class="cafe-rank">5</span>みはし 上野</a>
+                                            <div class="res-meta">🚶 步行約 6 分 | <span class="res-rating">⭐ 4.3</span></div>
+                                            <div class="res-desc">老字號甘味處，餡蜜與抹茶聖代，孩子吃甜點大人喝茶。</div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="meal-badges">
+                            <div class="dropdown transport-trigger" onclick="togglePopup(event, this)">
+                                <div class="dropbtn transport-btn">🚃 淺草 ➔ 秋葉原（2 站直達）</div>
+                                <div class="dropdown-content">
+                                    <div class="popup-header transport-header">🚇 超短移動指南 (約 5 分鐘)</div>
+                                    <ul class="popup-list">
+                                        <li class="transit-pub"><div class="res-name">🚃 JR：直達 2 站</div><div class="res-desc"><b>路線：</b> 淺草站步行 5 分到【淺草橋站】，搭 JR 総武線往「千葉」方向，1 站至「秋葉原站」。<br><b>出口：</b>【電氣街口】直走 1 分鐘到 BicCamera。<br>💡 也可從淺草搭都營淺草線至「東日本橋」再換乗，但 JR 最快。</div></li>
+                                        <li class="transit-taxi"><div class="res-name">🚕 計程車</div><div class="res-desc">車資約 NT$200-300。距離極短，帶疲憊孩子直達最輕鬆。</div></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="time-slot" id="d4-6">
+                    <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox" id="cb-d4-6" onchange="toggleRow(this)"></div>
+                    <div class="time" onclick="clickTime(this)">18:00 - 19:30</div>
                     <div class="activity">
-                        <span class="meal-highlight">🍽️ 晚餐時間</span>：行程最後一晚，在麻布十番或回上野周邊好好吃一頓！<div class="meal-badges auto-meal" data-loc="tower" data-meal="dinner"></div>
+                        🏮 <strong>阿美橫町散策 + 晚餐</strong>：從秋葉原搭 JR 1 站至「御徒町站」，出站即是 <a href="https://www.google.com/maps/search/?api=1&query=アメ横商店街" target="_blank" class="map-spot">阿美橫町（アメ横）</a>！昭和風情市場街，乾貨、零食、水果攤叫賣聲此起彼落，邊走邊逛 30 分鐘，沿著商店街一路往北走就回到上野，<strong>完全順路零繞路</strong>。<br>
+                        <span class="meal-highlight" style="margin-top:6px;">🍽️ 晚餐時間</span>：在阿美橫町或上野周邊吃晚餐。<div class="meal-badges auto-meal" data-loc="ueno" data-meal="dinner"></div>
                         <div class="meal-badges" style="margin-top: 0.2rem;">
                             <div class="dropdown transport-trigger" onclick="togglePopup(event, this)">
-                                <div class="dropbtn transport-btn">🚃 歸途：麻布十番 ➔ 上野</div>
+                                <div class="dropbtn transport-btn">🚃 秋葉原 ➔ 御徒町（阿美橫）➔ 上野</div>
                                 <div class="dropdown-content">
-                                    <div class="popup-header transport-header">🚇 輕鬆返回指南 (約 25 分鐘)</div>
+                                    <div class="popup-header transport-header">🚇 輕鬆返回指南 (約 4 分鐘)</div>
                                     <ul class="popup-list">
-                                        <li class="transit-pub"><div class="res-name">🚃 地鐵：換乗一次</div><div class="res-desc"><b>路線：</b> 麻布十番站搭【都營大江戸線】，至「上野御徒町站」直達。<br><b>出口：</b> 走回上野飯店。</div></li>
-                                        <li class="transit-taxi"><div class="res-name">🚕 計程車</div><div class="res-desc">車資約 NT$600-850。最後一晚，叫車直接回飯店讓孩子早點休息。</div></li>
+                                        <li class="transit-pub"><div class="res-name">🚃 JR 1 站 + 阿美橫町步行（推薦）</div><div class="res-desc"><b>路線：</b> 秋葉原站搭 JR【山手線/京濱東北線】往「上野」方向，<strong>1 站</strong>至「御徒町站」北口出站，眼前就是阿美橫町入口。<br><b>散策路線：</b> 沿アメ横商店街往北走約 400 公尺（邊逛邊走 30 分鐘），盡頭就是上野站，再走回飯店。傍晚時段叫賣最熱鬧。</div></li>
+                                        <li class="transit-taxi"><div class="res-name">🚕 計程車</div><div class="res-desc">車資約 NT$200。孩子玩到精疲力盡時，打車回飯店最溫柔。</div></li>
                                     </ul>
                                 </div>
                             </div>
@@ -1178,19 +1553,19 @@
                 
                 <div class="remark-block">
                     <div class="remark-title">💡 備案 & 突發狀況應對</div>
-                    <div class="remark-item"><span class="remark-tag">伊東屋太擠</span>暑假銀座人潮多，建議平日早上 10 點開門即進。人多時：先在地下 1F 買文具帶走，不用每層都逛。</div>
-                    <div class="remark-item"><span class="remark-tag">孩子不想逛文具</span>銀座 伊東屋附近的 <a href="https://www.google.com/maps/search/?api=1&query=マクドナルド+銀座" target="_blank" class="map-spot">麥當勞銀座</a> 或 <a href="https://www.google.com/maps/search/?api=1&query=銀座+ライオン" target="_blank" class="map-spot">銀座ライオン</a> 是孩子等待大人逛街的好去處，下午再集合。</div>
-                    <div class="remark-item"><span class="remark-tag">下雨天</span>今日最適合雨天：銀座地下街（銀座コア地下）→ KITTE 或 丸ビル 吃午餐 → 麻布十番（有長騎樓） → 搭大江戸線回上野，全程幾乎不需雨傘。</div>
-                    <div class="remark-item"><span class="remark-tag">備用景點</span>麻布十番散步完若還有體力：<a href="https://www.google.com/maps/search/?api=1&query=六本木ヒルズ" target="_blank" class="map-spot">六本木ヒルズ</a>（步行 15 分），森アーツセンターギャラリー或戶外廣場，退房前的最後體驗。</div>
+                    <div class="remark-item"><span class="remark-tag">晴空塔爆滿</span>天望甲板入場人數有限制，暑假建議一開門（8:00）或事先線上購票。人滿時：跳過展望台，直接去商場 Solamachi 逛 + 墨田水族館，下午照常前往淺草。</div>
+                    <div class="remark-item"><span class="remark-tag">孩子不配合</span>直接縮短晴空塔行程，從早上搭計程車直衝淺草，把時間全給 gashacoco + 花屋敷，孩子玩好玩滿更重要。</div>
+                    <div class="remark-item"><span class="remark-tag">下雨天</span>晴空塔→墨田水族館→Solamachi→gashacoco（室內）→花屋敷（部分戶外需雨衣）→BicCamera（室內），全程幾乎可免雨傘。</div>
+                    <div class="remark-item"><span class="remark-tag">備用景點</span><a href="https://www.google.com/maps/search/?api=1&query=国立科学博物館+上野" target="_blank" class="map-spot">国立科学博物館</a>（上野，飯店步行 10 分），恐龍化石與蒸汽機車展示，車車控孩子超愛，下雨天絕佳備案。</div>
                 </div>
 <div class="day-map-strip">
                     <span class="map-strip-label">📍 今日景點</span>
-                    <a href="https://www.google.com/maps/search/?api=1&query=伊東屋+銀座" target="_blank" class="map-pin-btn">📍 🖍️ 銀座伊東屋</a>
-                    <a href="https://www.google.com/maps/search/?api=1&query=麻布十番商店街" target="_blank" class="map-pin-btn">📍 🏘️ 麻布十番商店街</a>
-                    <a href="https://www.google.com/maps/search/?api=1&query=たぬき煎餅+麻布十番" target="_blank" class="map-pin-btn">📍 🥮 たぬき煎餅</a>
-                    <a href="https://www.google.com/maps/search/?api=1&query=豆源+麻布十番" target="_blank" class="map-pin-btn">📍 🫘 豆源</a>
-                    <a href="https://www.google.com/maps/search/?api=1&query=浪花家総本店+麻布十番" target="_blank" class="map-pin-btn">📍 🐟 浪花家</a>
-                    <a href="https://www.google.com/maps/dir/35.7141,139.7774/35.6717,139.7640/35.6585,139.7454/35.7141,139.7774" target="_blank" class="map-open-btn">🗺️ Google Maps 開啟路線</a>
+                    <a href="https://www.google.com/maps/search/?api=1&query=東京スカイツリー" target="_blank" class="map-pin-btn">📍 🗼 晴空塔</a>
+                    <a href="https://www.google.com/maps/search/?api=1&query=gashacoco+浅草" target="_blank" class="map-pin-btn">📍 🎰 gashacoco淺草</a>
+                    <a href="https://www.google.com/maps/search/?api=1&query=浅草花やしき" target="_blank" class="map-pin-btn">📍 🎡 花屋敷</a>
+                    <a href="https://www.google.com/maps/search/?api=1&query=ビックカメラ+秋葉原" target="_blank" class="map-pin-btn">📍 🛒 BicCamera秋葉原</a>
+                    <a href="https://www.google.com/maps/search/?api=1&query=アメ横商店街" target="_blank" class="map-pin-btn">📍 🏮 阿美橫町</a>
+                    <a href="https://www.google.com/maps/dir/35.7141,139.7774/35.7101,139.8107/35.7118,139.7966/35.7023,139.7745/35.7141,139.7774" target="_blank" class="map-open-btn">🗺️ Google Maps 開啟路線</a>
                 </div>
             </div>
 
@@ -1201,7 +1576,42 @@
                     <div class="checkbox-wrapper"><input type="checkbox" class="row-checkbox" id="cb-d5-1" onchange="toggleRow(this)"></div>
                     <div class="time" onclick="clickTime(this)">08:00 - 09:30</div>
                     <div class="activity">
-                        <span class="meal-highlight">🥞 早餐時間</span>：悠閒吃飽。<div class="meal-badges auto-meal" data-loc="ueno" data-meal="breakfast"></div>
+                        <span class="meal-highlight">🥞 早餐時間</span>：悠閒吃飽。
+                        <div class="meal-badges" style="margin-top:0.4rem;">
+                            <div class="dropdown cafe-trigger restaurant-trigger" onclick="togglePopup(event, this)">
+                                <div class="dropbtn cafe-btn">☕ 附近咖啡廳 Top 5（上野）</div>
+                                <div class="dropdown-content">
+                                    <div class="popup-header cafe-header">☕ 上野 高評價咖啡廳 Top 5</div>
+                                    <ul class="popup-list">
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E4%B8%8A%E9%87%8E%E3%82%B0%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B5%E3%83%AD%E3%83%B3%20%E4%B8%8A%E9%87%8E%E5%85%AC%E5%9C%92" target="_blank" class="res-name"><span class="cafe-rank">1</span>上野グリーンサロン</a>
+                                            <div class="res-meta">🚶 步行約 5 分 | <span class="res-rating">⭐ 4.0</span></div>
+                                            <div class="res-desc">上野公園內，熊貓造型咖哩飯與蛋包飯，100席寬敞嬰兒車OK。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E3%81%86%E3%81%95%E3%81%8E%E3%82%84%E3%82%AB%E3%83%95%E3%82%A7%20%E4%B8%8A%E9%87%8E" target="_blank" class="res-name"><span class="cafe-rank">2</span>うさぎやCAFÉ</a>
+                                            <div class="res-meta">🚶 步行約 6 分 | <span class="res-rating">⭐ 4.3</span></div>
+                                            <div class="res-desc">大正年間銅鑼燒老鋪經營，現做銅鑼燒鬆餅，職人紅豆餡。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=EVERYONEs%20CAFE%20%E4%B8%8A%E9%87%8E%E5%85%AC%E5%9C%92" target="_blank" class="res-name"><span class="cafe-rank">3</span>EVERYONEs CAFE</a>
+                                            <div class="res-meta">🚶 步行約 4 分 | <span class="res-rating">⭐ 4.1</span></div>
+                                            <div class="res-desc">熊貓鬆餅拼盤，166席含露台，おむつ替え台與兒童椅完備。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E3%82%B9%E3%82%BF%E3%83%BC%E3%83%90%E3%83%83%E3%82%AF%E3%82%B9%20%E4%B8%8A%E9%87%8E%E6%81%A9%E8%B3%9C%E5%85%AC%E5%9C%92" target="_blank" class="res-name"><span class="cafe-rank">4</span>星巴克 上野恩賜公園</a>
+                                            <div class="res-meta">🚶 步行約 5 分 | <span class="res-rating">⭐ 4.0</span></div>
+                                            <div class="res-desc">綠意環繞公園店，木質明亮空間，散步歇腳首選。</div>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=%E4%B8%8A%E5%B3%B6%E7%8F%88%E7%90%B2%E5%BA%97%20%E9%BB%92%E7%94%B0%E8%A8%98%E5%BF%B5%E9%A4%A8" target="_blank" class="res-name"><span class="cafe-rank">5</span>上島珈琲 黑田記念館</a>
+                                            <div class="res-meta">🚶 步行約 8 分 | <span class="res-rating">⭐ 4.2</span></div>
+                                            <div class="res-desc">美術館別館內，露台可賞四季，黑糖拿鐵招牌靜謐。</div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div><div class="meal-badges auto-meal" data-loc="ueno" data-meal="breakfast"></div>
                     </div>
                 </div>
                 <div class="time-slot" id="d5-2">
@@ -1689,6 +2099,97 @@
     }
 
 
+
+    // ── Current time slot highlight (Asia/Tokyo) ──
+    const TRIP_DATES = { 1: '2026-07-16', 2: '2026-07-17', 3: '2026-07-18', 4: '2026-07-19', 5: '2026-07-20' };
+
+    function getTokyoNow() {
+        // Reliable TZ conversion without external libs
+        const s = new Date().toLocaleString('en-US', { timeZone: 'Asia/Tokyo' });
+        return new Date(s);
+    }
+
+    function parseSlotRange(timeText, dateStr) {
+        // Handles "15:20 - 19:40", "21:30 後", "08:30 - 09:30"
+        const base = dateStr + 'T';
+        const m = timeText.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
+        if (m) {
+            return {
+                start: new Date(base + String(m[1]).padStart(2,'0') + ':' + m[2] + ':00'),
+                end:   new Date(base + String(m[3]).padStart(2,'0') + ':' + m[4] + ':00')
+            };
+        }
+        const m2 = timeText.match(/(\d{1,2}):(\d{2})\s*後/);
+        if (m2) {
+            return {
+                start: new Date(base + String(m2[1]).padStart(2,'0') + ':' + m2[2] + ':00'),
+                end:   new Date(base + '23:59:59')
+            };
+        }
+        return null;
+    }
+
+    let currentNowSlot = null;
+
+    function updateNowHighlight() {
+        const now = getTokyoNow();
+
+        // Clear previous
+        document.querySelectorAll('.time-slot.now').forEach(el => {
+            el.classList.remove('now');
+            const b = el.querySelector('.now-badge');
+            if (b) b.remove();
+        });
+        currentNowSlot = null;
+
+        // Determine which trip day (if any) today is
+        const todayStr = now.getFullYear() + '-' +
+            String(now.getMonth()+1).padStart(2,'0') + '-' +
+            String(now.getDate()).padStart(2,'0');
+
+        let dayNum = null;
+        for (const [d, ds] of Object.entries(TRIP_DATES)) {
+            if (ds === todayStr) { dayNum = d; break; }
+        }
+
+        const nowBtn = document.getElementById('nowBtn');
+        if (!dayNum) {
+            if (nowBtn) nowBtn.style.display = 'none';
+            return; // Not during the trip
+        }
+        if (nowBtn) nowBtn.style.display = '';
+
+        // Scan today's slots
+        const slots = document.querySelectorAll('.time-slot[id^="d' + dayNum + '-"]');
+        for (const slot of slots) {
+            const timeEl = slot.querySelector('.time');
+            if (!timeEl) continue;
+            const range = parseSlotRange(timeEl.textContent.trim(), TRIP_DATES[dayNum]);
+            if (!range) continue;
+            if (now >= range.start && now <= range.end) {
+                slot.classList.add('now');
+                const badge = document.createElement('span');
+                badge.className = 'now-badge';
+                badge.textContent = '▶ 現在';
+                timeEl.appendChild(badge);
+                currentNowSlot = slot;
+                break;
+            }
+        }
+    }
+
+    function scrollToNow() {
+        updateNowHighlight();
+        if (currentNowSlot) {
+            currentNowSlot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+            alert('現在時刻不在任何行程時段內（行程為日本時間 7/16–7/20）');
+        }
+    }
+
+    // Refresh every minute
+    setInterval(updateNowHighlight, 60 * 1000);
+
     // ── Dark Mode ──
     function toggleDark() {
         const isDark = document.body.classList.toggle('dark-mode');
@@ -1727,10 +2228,11 @@
         body.classList.toggle('open');
         icon.textContent = body.classList.contains('open') ? '▲' : '▼';
     }
-    function togglePre(item) {
-        if (event.target.tagName === 'A') return;
+    function togglePre(item, ev) {
+        ev = ev || window.event;
+        if (ev && ev.target && ev.target.tagName === 'A') return;
         const cb = item.querySelector('.pre-check');
-        if (event.target !== cb) cb.checked = !cb.checked;
+        if (!ev || ev.target !== cb) cb.checked = !cb.checked;
         const txt = item.querySelector('.pretripcheck-text');
         txt.classList.toggle('done', cb.checked);
         storage.set(cb.id, cb.checked ? '1' : '0');
@@ -1803,6 +2305,24 @@
         });
         if (!wasActive) {
             element.classList.add('popup-active');
+            // FIX: keep popup inside viewport
+            const popup = element.querySelector('.dropdown-content');
+            if (popup) {
+                popup.style.left = '';
+                popup.style.right = '';
+                requestAnimationFrame(() => {
+                    const rect = popup.getBoundingClientRect();
+                    const vw = window.innerWidth;
+                    if (rect.right > vw - 8) {
+                        popup.style.left = 'auto';
+                        popup.style.right = '0';
+                    }
+                    if (popup.getBoundingClientRect().left < 8) {
+                        popup.style.left = (8 - element.getBoundingClientRect().left) + 'px';
+                        popup.style.right = 'auto';
+                    }
+                });
+            }
         }
     }
 
@@ -1842,6 +2362,9 @@
             }
         });
         updatePretripProgress();
+
+        // Activate now-highlight
+        updateNowHighlight();
 
         // Load saved checklist state
         document.querySelectorAll('.row-checkbox').forEach(function(checkbox) {
